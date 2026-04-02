@@ -1,0 +1,19 @@
+{
+  "sqft": 1500,
+  "bedrooms": 3,
+  "bathrooms": 2,
+  "balconies": 1,
+  "parking": 1,
+  "age": 5,
+  "floor": 3,
+  "total_floors": 10,
+  "furnished": 1,
+  "amenities_count": 5,
+  "distance_metro": 2.5,
+  "distance_school": 1.0,
+  "distance_hospital": 3.0,
+  "location_encoded": 0,
+  "age_bucket_encoded": 1,
+  "luxury_score": 0.5,
+  "roi": 15.0
+}
