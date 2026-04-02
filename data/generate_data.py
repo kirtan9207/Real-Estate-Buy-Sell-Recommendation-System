@@ -4,90 +4,96 @@ import random
 from datetime import datetime, timedelta
 import os
 
-def generate_synthetic_data(num_records=5000):
-    locations = ['Downtown', 'Suburbs', 'Green Valley', 'Industrial Zone', 'Riverside', 'Hilltop', 'Tech Park', 'Historic District']
+def generate_production_data(num_records=20000):
+    # Realistic locations inspired by major metros (e.g. Bangalore/Mumbai areas)
+    locations = {
+        'Whitefield': {'base_price': 8500, 'growth': 0.12, 'lat': 12.9698, 'lon': 77.7499, 'segment': 'Mid-range'},
+        'Indiranagar': {'base_price': 18000, 'growth': 0.08, 'lat': 12.9719, 'lon': 77.6412, 'segment': 'Premium'},
+        'Electronic City': {'base_price': 6000, 'growth': 0.15, 'lat': 12.8452, 'lon': 77.6635, 'segment': 'Emerging'},
+        'Koramangala': {'base_price': 15000, 'growth': 0.07, 'lat': 12.9352, 'lon': 77.6245, 'segment': 'Premium'},
+        'HSR Layout': {'base_price': 11000, 'growth': 0.10, 'lat': 12.9121, 'lon': 77.6446, 'segment': 'Mid-range'},
+        'Sarjapur Road': {'base_price': 7500, 'growth': 0.14, 'lat': 12.9063, 'lon': 77.6823, 'segment': 'Emerging'},
+        'Hebbal': {'base_price': 9500, 'growth': 0.11, 'lat': 13.0354, 'lon': 77.5988, 'segment': 'Mid-range'},
+        'Bannerghatta': {'base_price': 7000, 'growth': 0.13, 'lat': 12.8711, 'lon': 77.5922, 'segment': 'Budget'}
+    }
+    
+    property_types = ['Apartment', 'Villa', 'Penthouse', 'Builder Floor']
+    builders = ['Prestige Group', 'Sobha Ltd', 'Brigade Group', 'Puravankara', 'Godrej Properties', 'Lodha Group']
+    furnishing = ['Unfurnished', 'Semi-furnished', 'Fully-furnished']
+    listing_types = ['Resale', 'New Launch', 'Ready to Move']
     
     data = []
-    start_date = datetime(2020, 1, 1)
+    start_date = datetime(2022, 1, 1)
     
     for i in range(num_records):
-        property_id = f"PROP_{i+1000}"
-        location = random.choice(locations)
+        loc_name = random.choice(list(locations.keys()))
+        loc_meta = locations[loc_name]
         
-        # Base price per sqft depends on location
-        base_price_map = {
-            'Downtown': 10000,
-            'Suburbs': 5000,
-            'Green Valley': 7000,
-            'Industrial Zone': 4000,
-            'Riverside': 8500,
-            'Hilltop': 9000,
-            'Tech Park': 8000,
-            'Historic District': 9500
-        }
-        
-        sqft = random.randint(500, 5000)
-        bedrooms = random.randint(1, 5)
+        sqft = random.randint(600, 4500)
+        bedrooms = random.randint(1, 4) if sqft < 2500 else random.randint(3, 5)
         bathrooms = max(1, bedrooms - random.randint(0, 1))
-        balconies = random.randint(0, 3)
-        parking = random.randint(0, 2)
-        age = random.randint(0, 30)
-        total_floors = random.randint(1, 20)
-        floor = random.randint(0, total_floors)
-        furnished = random.choice([0, 1, 2]) # 0: Unfurnished, 1: Semi, 2: Full
-        amenities_count = random.randint(0, 15)
+        age = random.randint(0, 20)
         
-        distance_metro = round(random.uniform(0.1, 15.0), 2)
-        distance_school = round(random.uniform(0.1, 10.0), 2)
-        distance_hospital = round(random.uniform(0.1, 12.0), 2)
+        # Base logic + realistic variability
+        price_per_sqft = loc_meta['base_price']
+        if age < 2: price_per_sqft *= 1.15
+        if age > 10: price_per_sqft *= 0.85
         
-        # Latitude/Longitude (Approx for a city)
-        latitude = round(random.uniform(12.8, 13.2), 6)
-        longitude = round(random.uniform(77.4, 77.8), 6)
+        # Amenities & Proximity
+        dist_metro = round(random.uniform(0.2, 12.0), 2)
+        amenities = random.randint(2, 18)
         
-        listing_date = start_date + timedelta(days=random.randint(0, 1500))
-        # Some are sold, some not
-        is_sold = random.random() > 0.3
-        sale_date = listing_date + timedelta(days=random.randint(10, 180)) if is_sold else None
+        # Calculate Price
+        base_price = sqft * price_per_sqft
+        base_price += (bedrooms * 400000) + (amenities * 150000)
+        if dist_metro < 2: base_price *= 1.12
         
-        # Calculate price with some logic + noise
-        price = (sqft * base_price_map[location]) 
-        price += (bedrooms * 500000)
-        price += (amenities_count * 100000)
-        price -= (age * 50000)
-        price -= (distance_metro * 200000)
+        # Market Noise
+        actual_price = int(base_price * random.uniform(0.92, 1.08))
         
-        # Add random noise
-        noise = random.uniform(0.9, 1.1)
-        price = int(price * noise)
+        # Derived Analysis Features
+        roi = round((loc_meta['growth'] * 100) + random.uniform(-2, 3), 2)
+        demand_score = random.randint(40, 95)
+        liquidity_score = random.randint(30, 90)
+        
+        # Scores
+        connectivity = round(10 - (dist_metro * 0.5), 1)
+        safety = random.randint(6, 10)
+        schools = random.randint(5, 10)
+        
+        listing_date = start_date + timedelta(days=random.randint(0, 730))
         
         data.append({
-            'property_id': property_id,
-            'location': location,
-            'latitude': latitude,
-            'longitude': longitude,
+            'property_id': f"RE-{i+10001}",
+            'location': loc_name,
+            'builder_name': random.choice(builders),
+            'property_type': random.choice(property_types),
+            'furnishing': random.choice(furnishing),
+            'listing_type': random.choice(listing_types),
             'sqft': sqft,
             'bedrooms': bedrooms,
             'bathrooms': bathrooms,
-            'balconies': balconies,
-            'parking': parking,
             'age': age,
-            'floor': floor,
-            'total_floors': total_floors,
-            'furnished': furnished,
-            'amenities_count': amenities_count,
-            'distance_metro': distance_metro,
-            'distance_school': distance_school,
-            'distance_hospital': distance_hospital,
+            'amenities_count': amenities,
+            'distance_metro': dist_metro,
+            'price': actual_price,
+            'latitude': loc_meta['lat'] + random.uniform(-0.01, 0.01),
+            'longitude': loc_meta['lon'] + random.uniform(-0.01, 0.01),
+            'demand_score': demand_score,
+            'liquidity_score': liquidity_score,
+            'connectivity_score': connectivity,
+            'safety_score': safety,
+            'school_score': schools,
+            'roi': roi,
+            'market_trend': loc_meta['growth'] + random.uniform(-0.02, 0.02),
             'listing_date': listing_date.strftime('%Y-%m-%d'),
-            'sale_date': sale_date.strftime('%Y-%m-%d') if sale_date else None,
-            'price': price
+            'cluster_label': loc_meta['segment']
         })
     
     df = pd.DataFrame(data)
     os.makedirs('data/raw', exist_ok=True)
-    df.to_csv('data/raw/raw_properties.csv', index=False)
-    print(f"Generated {num_records} records in data/raw/raw_properties.csv")
+    df.to_csv('data/raw/production_properties.csv', index=False)
+    print(f"Generated {num_records} premium records in data/raw/production_properties.csv")
 
 if __name__ == "__main__":
-    generate_synthetic_data()
+    generate_production_data()
