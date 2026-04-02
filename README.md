@@ -1,62 +1,66 @@
-# Real Estate Intelligence Platform 🏡
+# Real Estate Intelligence Platform
 
-This project is a complete property intelligence platform designed to help buyers and investors find undervalued properties using machine learning. It provides automated valuations, market segmentation, and investment signals (Buy/Sell/Hold).
+A complete production-grade property intelligence system designed for real estate investors and market analysts. The platform utilizes machine learning to identify undervalued properties, forecast ROI, and generate strategic buy/sell signals across emerging market clusters.
 
-## Why this exists?
-Traditional real estate listing sites show you the price but don't tell you if it's a good deal. This system uses an ensemble of regressors (XGBoost, Random Forest, etc.) to predict the *fair market value* of properties and flags anything listed below its intrinsic value.
+## Core Features
 
-## 🚀 Tech Stack
-- **Backend:** FastAPI (Python 3.11)
-- **Frontend:** React + Vite (Dark Theme Dashboard)
-- **Database:** PostgreSQL (with Dockerized Init scripts)
-- **ML Engine:** Scikit-Learn, XGBoost, KMeans (Clustering)
-- **Ops:** Docker, Docker Compose
+- **Strategic AI Valuer**: High-precision price prediction engine using XGBoost trained on 20,000+ realistic market listings.
+- **Investment Signals**: Automated buy/hold/sell logic based on 5-year ROI forecasts and local market momentum.
+- **Geographical Heatmaps**: Interactive Leaflet-based visualization of ROI distribution and regional demand scores.
+- **Market Segmentation**: KMeans clustering to categorize the market into Budget, Mid-range, Premium, and Emerging High-Growth zones.
+- **Advanced ROI Analytics**: Deep-dive analytics for rental yield estimation and appreciation trends.
 
-## 🛠️ Getting Started
+## Technical Architecture
 
-### Prerequisites
-You'll need Docker installed on your machine.
+The platform is designed as a modular micro-services architecture for scalability:
 
-### One-Command Setup
-I've dockerized everything. Just run:
+1. **ML Pipeline**: Automated cleaning, feature engineering (Location & Luxury scores), and multi-model training/serialization. 
+2. **Backend API**: Optimized FastAPI service providing structured JSON responses for complex financial reports.
+3. **Frontend Dashboard**: Responsive React + Vite application with professional dashboard components, Recharts for data visualization, and Lucide-React for typography-driven iconography.
+4. **Data Engine**: Synthetic yet realistic data generator producing high-fidelity datasets with 20,000 samples including builder reputation, connectivity scores, and historical trends.
+
+## Technology Stack
+
+- **ML**: Python, Pandas, Scikit-learn, XGBoost
+- **API**: FastAPI, Uvicorn, Pydantic
+- **Development**: Docker, Docker Compose
+- **Frontend**: React, Recharts, Leaflet, Tailwind (Design Tokens)
+
+## Getting Started
+
+### Local Setup (Docker)
+
+To run the full production stack:
+
 ```bash
 docker compose up --build
 ```
-This will:
-1. Spin up the Postgres database.
-2. Build and start the FastAPI ML backend.
-3. Start the React dashboard.
 
-After it's running, you can access:
-- **Dashboard:** [http://localhost:5173](http://localhost:5173)
-- **Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+Access the components at:
+- Dashboard: http://localhost:5173
+- API Documentation: http://localhost:8000/docs
+- Database: Local PostgreSQL (exposed on port 5432)
 
-## 🏗️ System Architecture
-1. **Data Pipeline:** Scripts in `ml/scripts/` handle cleaning and feature engineering (like Luxury Score and Location Ranking).
-2. **ML Core:** We train a variety of models. Currently, XGBoost is our best performer for price prediction. We also use KMeans to cluster properties into *Budget, Mid-range, Premium,* and *Emerging* segments.
-3. **API Service:** FastAPI connects to our stored models and gives real-time recommendations.
-4. **The UI:** A financial-grade dark mode dashboard to visualize ROI and potential deals.
+### ML Training Pipeline
 
-## 📊 Endpoints to Try
-- `GET /undervalued`: List properties priced significantly below market value.
-- `POST /predict`: Submit property details to get an AI valuation.
-- `GET /clusters`: See how the market is currently segmented.
-- `GET /trend?location=Riverside`: View historical price trends for a specific area.
+If updates to the model logic are required, individual scripts can be executed:
 
-## 📂 Project Structure
-```text
-├── backend/            # FastAPI app
-├── frontend/           # React dashboard source
-├── ml/                 # Machine Learning pipeline
-│   ├── scripts/        # Training & cleaning scripts
-│   ├── models/         # Saved .pkl models
-│   └── reports/        # HTML EDA & Evaluation reports
-├── data/               # Raw & Processed datasets
-├── docker/             # Docker configuration
-└── docker-compose.yml  # Orchestration
+```bash
+# Clean data
+python ml/scripts/cleaning_pipeline.py
+
+# Engineer features
+python ml/scripts/feature_engineering.py
+
+# Train Production Ensemble
+python ml/scripts/train_models.py
 ```
 
-## Contributing
-Feel free to open a PR for any fixes or enhancements!
+## Future Improvements
 
-*Built with ❤️ for real estate enthusiasts.*
+- Implementation of user authentication (JWT) for private investment portfolios.
+- Automated API deployment to Render/Railway using terraform or shell-based CI/CD scripts.
+- Integration of live web-scraped data from major property listing platforms.
+
+---
+Project developed as a production-level data product.
