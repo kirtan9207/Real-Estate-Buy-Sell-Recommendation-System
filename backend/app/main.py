@@ -6,7 +6,18 @@ import os
 from typing import List, Optional
 import numpy as np
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="Real Estate Intelligence Platform")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Model Paths
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "../../../ml/models")
