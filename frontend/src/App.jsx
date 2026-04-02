@@ -174,14 +174,14 @@ function App() {
 
         {view === 'predict' && (
           <div style={{maxWidth: '1000px', margin: 'auto'}}>
-            <h1 style={{fontSize: '2rem', fontWeight: 800, marginBottom: 32}}>Professional AI Valuer</h1>
+            <h1 style={{fontSize: '2rem', fontWeight: 800, marginBottom: 32}}>Price Predictor</h1>
             <div className="kpi-card" style={{marginBottom: 40}}>
                <form onSubmit={handleValuation} style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24}}>
                   <div><div className="kpi-title">SQFT</div><input type="number" value={valuationData.sqft} onChange={e=>setValuationData({...valuationData, sqft: parseInt(e.target.value)})} style={{background:'#000', border:'1px solid #222', color:'#fff', padding:8, borderRadius:6, width:'100%'}}/></div>
                   <div><div className="kpi-title">BEDROOMS</div><input type="number" value={valuationData.bedrooms} onChange={e=>setValuationData({...valuationData, bedrooms: parseInt(e.target.value)})} style={{background:'#000', border:'1px solid #222', color:'#fff', padding:8, borderRadius:6, width:'100%'}}/></div>
                   <div><div className="kpi-title">LOCATION ID</div><input type="number" value={valuationData.location_id} onChange={e=>setValuationData({...valuationData, location_id: parseInt(e.target.value)})} style={{background:'#000', border:'1px solid #222', color:'#fff', padding:8, borderRadius:6, width:'100%'}}/></div>
                   <div><div className="kpi-title">QUALITY SCORE</div><input type="number" step="0.1" value={valuationData.q_score} onChange={e=>setValuationData({...valuationData, q_score: parseFloat(e.target.value)})} style={{background:'#000', border:'1px solid #222', color:'#fff', padding:8, borderRadius:6, width:'100%'}}/></div>
-                  <button type="submit" className="btn-primary" style={{gridColumn: '1 / -1'}}>{loading ? 'SYCHRONIZING MODELS...' : 'RUN VALUATION REPORT'}</button>
+                  <button type="submit" className="btn-primary" style={{gridColumn: '1 / -1'}}>{loading ? 'SYCHRONIZING MODELS...' : 'RUN ANALYTIC REPORT'}</button>
                </form>
             </div>
 
