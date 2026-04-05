@@ -16,6 +16,12 @@ COPY data ./data
 COPY ml ./ml
 COPY backend ./backend
 
+# Create non-root user and set ownership
+RUN useradd -m -u 1000 -s /bin/bash tuf \
+    && chown -R tuf:tuf /app
+
+USER tuf
+
 EXPOSE 8000
 
 CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
