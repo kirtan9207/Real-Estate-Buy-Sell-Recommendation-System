@@ -15,15 +15,15 @@ import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.metrics.pairwise import cosine_similarity
 
-# ─── Page Config ──────────────────────────────────────────
+# --- Page Config ---
 st.set_page_config(
     page_title="Bangalore Real Estate Intelligence",
-    page_icon="🏗️",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ─── Custom CSS ───────────────────────────────────────────
+# --- Custom CSS ---
 st.markdown("""
 <style>
     .main { background-color: #0a0a0a; }
@@ -42,13 +42,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ─── Data Loading ─────────────────────────────────────────
+# --- Data Loading ---
 @st.cache_data
 def load_data():
     base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data_path = os.path.join(base, 'data/processed/production_final.csv')
     if not os.path.exists(data_path):
-        st.error("⚠️ Run the pipeline first: `python run_pipeline.py`")
+        st.error("Run the pipeline first: python run_pipeline.py")
         st.stop()
     return pd.read_csv(data_path)
 
@@ -74,16 +74,16 @@ def load_model(name):
 
 df = load_data()
 
-# ─── Sidebar ──────────────────────────────────────────────
-st.sidebar.markdown("## 🏗️ **INTELLIGENCE**")
+# --- Sidebar ---
+st.sidebar.markdown("## **INTELLIGENCE**")
 st.sidebar.markdown("---")
 
 page = st.sidebar.radio(
     "Navigate",
-    ["🏠 Overview", "🔮 Price Prediction", "🗺️ Location Heatmap",
-     "💎 Undervalued Properties", "📊 Model Performance",
-     "🎯 Buyer Matching", "📈 ROI Comparison",
-     "🟢 Buy/Sell Signal", "📋 Executive Report"],
+    ["Overview", "Price Prediction", "Location Heatmap",
+     "Undervalued Properties", "Model Performance",
+     "Buyer Matching", "ROI Comparison",
+     "Buy/Sell Signal", "Executive Report"],
     label_visibility="collapsed"
 )
 
@@ -91,16 +91,16 @@ st.sidebar.markdown("---")
 st.sidebar.markdown(f"**{len(df):,}** properties loaded")
 st.sidebar.markdown(f"**{df['location'].nunique()}** locations")
 
-# ═══════════════════════════════════════════════════════════
+# ===================================================================
 # PAGE 1: OVERVIEW
-# ═══════════════════════════════════════════════════════════
-if page == "🏠 Overview":
-    st.title("📊 Market Intelligence Dashboard")
+# ===================================================================
+if page == "Overview":
+    st.title("Market Intelligence Dashboard")
     st.markdown("Real-time analytics for Bangalore real estate market")
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Total Properties", f"{len(df):,}")
-    c2.metric("Avg Price", f"₹{df['price'].mean()/1e7:.2f}Cr")
+    c2.metric("Avg Price", f"Rs.{df['price'].mean()/1e7:.2f}Cr")
     c3.metric("Avg ROI", f"{df['roi'].mean():.1f}%")
     best_loc = df.groupby('location')['roi'].mean().idxmax()
     c4.metric("Best ROI Location", best_loc)
@@ -138,11 +138,11 @@ if page == "🏠 Overview":
     fig.update_layout(template='plotly_dark', height=350)
     st.plotly_chart(fig, use_container_width=True)
 
-# ═══════════════════════════════════════════════════════════
+# ===================================================================
 # PAGE 2: PRICE PREDICTION
-# ═══════════════════════════════════════════════════════════
-elif page == "🔮 Price Prediction":
-    st.title("🔮 Price Prediction Tool")
+# ===================================================================
+elif page == "Price Prediction":
+    st.title("Price Prediction Tool")
 
     model = load_model('price_model.pkl')
     encoders = load_model('encoders.pkl')
@@ -177,7 +177,7 @@ elif page == "🔮 Price Prediction":
         dist_hospital = st.slider("Distance to Hospital (km)", 0.3, 10.0, 2.0)
         dist_cbd = st.slider("Distance to CBD (km)", 1.0, 30.0, 10.0)
 
-    if st.button("🔮 Predict Price", type="primary", use_container_width=True):
+    if st.button("Predict Price", type="primary", use_container_width=True):
         # Compute derived features
         connectivity = max(1.0, 10.0 - (dist_metro * 0.4 + dist_cbd * 0.15))
         safety = 7
@@ -207,23 +207,23 @@ elif page == "🔮 Price Prediction":
         predicted_price = int(model.predict([features])[0])
 
         st.markdown("---")
-        st.success(f"### 💰 Predicted Price: ₹{predicted_price:,}")
+        st.success(f"### Predicted Price: Rs.{predicted_price:,}")
 
         mc1, mc2, mc3 = st.columns(3)
-        mc1.metric("Price Range (Low)", f"₹{int(predicted_price * 0.92):,}")
-        mc2.metric("Predicted", f"₹{predicted_price:,}")
-        mc3.metric("Price Range (High)", f"₹{int(predicted_price * 1.08):,}")
+        mc1.metric("Price Range (Low)", f"Rs.{int(predicted_price * 0.92):,}")
+        mc2.metric("Predicted", f"Rs.{predicted_price:,}")
+        mc3.metric("Price Range (High)", f"Rs.{int(predicted_price * 1.08):,}")
 
         # Find similar properties
         loc_data = df[df['location'] == location]
         avg_loc = loc_data['price'].mean()
-        st.info(f"📍 Average price in **{location}**: ₹{avg_loc:,.0f} | Your prediction: ₹{predicted_price:,}")
+        st.info(f"Average price in **{location}**: Rs.{avg_loc:,.0f} | Your prediction: Rs.{predicted_price:,}")
 
-# ═══════════════════════════════════════════════════════════
+# ===================================================================
 # PAGE 3: LOCATION HEATMAP
-# ═══════════════════════════════════════════════════════════
-elif page == "🗺️ Location Heatmap":
-    st.title("🗺️ Bangalore Market Heatmap")
+# ===================================================================
+elif page == "Location Heatmap":
+    st.title("Bangalore Market Heatmap")
 
     try:
         import folium
@@ -250,13 +250,13 @@ elif page == "🗺️ Location Heatmap":
                 location=[row['lat'], row['lon']],
                 radius=max(8, row['count'] / 50),
                 color=color, fill=True, fill_color=color, fill_opacity=0.6,
-                popup=f"<b>{row['location']}</b><br>Avg: ₹{row['avg_price']/1e7:.2f}Cr<br>ROI: {row['avg_roi']:.1f}%<br>Properties: {row['count']}"
+                popup=f"<b>{row['location']}</b><br>Avg: Rs.{row['avg_price']/1e7:.2f}Cr<br>ROI: {row['avg_roi']:.1f}%<br>Properties: {row['count']}"
             ).add_to(m)
 
         st_folium(m, width=None, height=600)
 
     except ImportError:
-        st.warning("Install folium and streamlit-folium: `pip install folium streamlit-folium`")
+        st.warning("Install folium and streamlit-folium: pip install folium streamlit-folium")
 
         # Fallback to plotly
         loc_agg = df.groupby('location').agg(lat=('latitude', 'mean'), lon=('longitude', 'mean'), avg_roi=('roi', 'mean')).reset_index()
@@ -265,11 +265,11 @@ elif page == "🗺️ Location Heatmap":
         fig.update_layout(height=600)
         st.plotly_chart(fig, use_container_width=True)
 
-# ═══════════════════════════════════════════════════════════
+# ===================================================================
 # PAGE 4: UNDERVALUED PROPERTIES
-# ═══════════════════════════════════════════════════════════
-elif page == "💎 Undervalued Properties":
-    st.title("💎 Undervalued Property Deals")
+# ===================================================================
+elif page == "Undervalued Properties":
+    st.title("Undervalued Property Deals")
 
     if 'valuation_label' in df.columns:
         underpriced = df[df['valuation_label'] == 'Underpriced'].sort_values('price_gap_pct')
@@ -282,7 +282,7 @@ elif page == "💎 Undervalued Properties":
         # Filters
         col1, col2 = st.columns(2)
         loc_filter = col1.multiselect("Filter by Location", df['location'].unique())
-        budget = col2.slider("Max Budget (₹ Cr)", 0.5, 10.0, 5.0)
+        budget = col2.slider("Max Budget (Rs. Cr)", 0.5, 10.0, 5.0)
 
         filtered = underpriced.copy()
         if loc_filter:
@@ -293,17 +293,17 @@ elif page == "💎 Undervalued Properties":
             filtered[['property_id', 'location', 'property_type', 'sqft', 'bedrooms',
                       'price', 'predicted_price', 'price_gap_pct', 'roi', 'sell_signal']]
             .head(50)
-            .style.format({'price': '₹{:,.0f}', 'predicted_price': '₹{:,.0f}', 'price_gap_pct': '{:.1f}%', 'roi': '{:.1f}%'}),
+            .style.format({'price': 'Rs.{:,.0f}', 'predicted_price': 'Rs.{:,.0f}', 'price_gap_pct': '{:.1f}%', 'roi': '{:.1f}%'}),
             use_container_width=True, height=500
         )
     else:
         st.warning("Run recommendation engine first.")
 
-# ═══════════════════════════════════════════════════════════
+# ===================================================================
 # PAGE 5: MODEL PERFORMANCE
-# ═══════════════════════════════════════════════════════════
-elif page == "📊 Model Performance":
-    st.title("📊 Model Performance & Diagnostics")
+# ===================================================================
+elif page == "Model Performance":
+    st.title("Model Performance & Diagnostics")
 
     eval_report = load_json_report('evaluation_report.json')
     baseline = load_json_report('baseline_results.json')
@@ -314,7 +314,7 @@ elif page == "📊 Model Performance":
         bl_data = []
         for name in ['global_mean', 'global_median', 'location_mean']:
             b = baseline.get(name, {})
-            bl_data.append({'Model': name.replace('_', ' ').title(), 'RMSE': b.get('rmse', 0), 'MAE': b.get('mae', 0), 'R²': b.get('r2', 0)})
+            bl_data.append({'Model': name.replace('_', ' ').title(), 'RMSE': b.get('rmse', 0), 'MAE': b.get('mae', 0), 'R2': b.get('r2', 0)})
         st.dataframe(pd.DataFrame(bl_data), use_container_width=True)
 
     # Model metrics
@@ -326,7 +326,7 @@ elif page == "📊 Model Performance":
 
         # Bar chart
         m_df = pd.DataFrame(m_data)
-        fig = px.bar(m_df, x='Model', y='r2', color='Model', title='R² Score Comparison',
+        fig = px.bar(m_df, x='Model', y='r2', color='Model', title='R2 Score Comparison',
                      color_discrete_sequence=['#6366f1', '#8b5cf6', '#a78bfa', '#2563eb'])
         fig.update_layout(template='plotly_dark')
         st.plotly_chart(fig, use_container_width=True)
@@ -345,22 +345,22 @@ elif page == "📊 Model Performance":
         if os.path.exists(path):
             cols[i % 2].image(path, caption=plot.replace('_', ' ').replace('.png', '').title())
 
-# ═══════════════════════════════════════════════════════════
+# ===================================================================
 # PAGE 6: BUYER MATCHING
-# ═══════════════════════════════════════════════════════════
-elif page == "🎯 Buyer Matching":
-    st.title("🎯 Buyer Preference Matching")
+# ===================================================================
+elif page == "Buyer Matching":
+    st.title("Buyer Preference Matching")
 
     col1, col2 = st.columns(2)
     with col1:
-        budget = st.slider("Budget (₹ Lakhs)", 20, 800, 150) * 1e5
+        budget = st.slider("Budget (Rs. Lakhs)", 20, 800, 150) * 1e5
         bedrooms = st.selectbox("Preferred Bedrooms", [1, 2, 3, 4, 5], index=1)
         min_sqft = st.slider("Minimum Sqft", 500, 4000, 1000)
     with col2:
         pref_location = st.selectbox("Preferred Location", ['Any'] + sorted(df['location'].unique().tolist()))
         min_amenities = st.slider("Min Amenities", 2, 20, 5)
 
-    if st.button("🔍 Find Matching Properties", type="primary", use_container_width=True):
+    if st.button("Find Matching Properties", type="primary", use_container_width=True):
         artifacts = load_model('recommendation_artifacts.pkl')
 
         if artifacts is not None:
@@ -393,17 +393,17 @@ elif page == "🎯 Buyer Matching":
             st.dataframe(
                 top[['property_id', 'location', 'property_type', 'sqft', 'bedrooms',
                      'price', 'roi', 'match_score']]
-                .style.format({'price': '₹{:,.0f}', 'roi': '{:.1f}%', 'match_score': '{:.3f}'}),
+                .style.format({'price': 'Rs.{:,.0f}', 'roi': '{:.1f}%', 'match_score': '{:.3f}'}),
                 use_container_width=True
             )
         else:
             st.warning("Run recommendation engine first.")
 
-# ═══════════════════════════════════════════════════════════
+# ===================================================================
 # PAGE 7: ROI COMPARISON
-# ═══════════════════════════════════════════════════════════
-elif page == "📈 ROI Comparison":
-    st.title("📈 ROI & Market Trend Analysis")
+# ===================================================================
+elif page == "ROI Comparison":
+    st.title("ROI & Market Trend Analysis")
 
     loc_roi = df.groupby('location').agg(
         avg_roi=('roi', 'mean'),
@@ -423,20 +423,20 @@ elif page == "📈 ROI Comparison":
                       color='avg_trend', text='location',
                       color_continuous_scale='Viridis',
                       title='ROI vs Average Price',
-                      labels={'avg_price': 'Avg Price (₹)', 'avg_roi': 'Avg ROI (%)'})
+                      labels={'avg_price': 'Avg Price (Rs.)', 'avg_roi': 'Avg ROI (%)'})
     fig2.update_traces(textposition='top center', textfont_size=9)
     fig2.update_layout(template='plotly_dark', height=450)
     st.plotly_chart(fig2, use_container_width=True)
 
     st.dataframe(loc_roi.style.format({
-        'avg_roi': '{:.1f}%', 'avg_trend': '{:.1f}%', 'avg_price': '₹{:,.0f}'
+        'avg_roi': '{:.1f}%', 'avg_trend': '{:.1f}%', 'avg_price': 'Rs.{:,.0f}'
     }), use_container_width=True)
 
-# ═══════════════════════════════════════════════════════════
+# ===================================================================
 # PAGE 8: BUY/SELL SIGNAL
-# ═══════════════════════════════════════════════════════════
-elif page == "🟢 Buy/Sell Signal":
-    st.title("🟢 Buy/Sell Recommendation Signal")
+# ===================================================================
+elif page == "Buy/Sell Signal":
+    st.title("Buy/Sell Recommendation Signal")
 
     if 'sell_signal' in df.columns:
         signal_counts = df['sell_signal'].value_counts()
@@ -460,8 +460,8 @@ elif page == "🟢 Buy/Sell Signal":
 
                 st.json({
                     'location': p['location'],
-                    'price': f"₹{p['price']:,.0f}",
-                    'predicted_price': f"₹{p.get('predicted_price', 0):,.0f}",
+                    'price': f"Rs.{p['price']:,.0f}",
+                    'predicted_price': f"Rs.{p.get('predicted_price', 0):,.0f}",
                     'gap': f"{p.get('price_gap_pct', 0):.1f}%",
                     'signal': p.get('sell_signal', 'N/A'),
                     'demand_score': int(p['demand_score']),
@@ -471,11 +471,11 @@ elif page == "🟢 Buy/Sell Signal":
     else:
         st.warning("Run recommendation engine first.")
 
-# ═══════════════════════════════════════════════════════════
+# ===================================================================
 # PAGE 9: EXECUTIVE REPORT
-# ═══════════════════════════════════════════════════════════
-elif page == "📋 Executive Report":
-    st.title("📋 Executive Summary Report")
+# ===================================================================
+elif page == "Executive Report":
+    st.title("Executive Summary Report")
 
     base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     report_path = os.path.join(base, 'ml/reports/executive_report.html')
@@ -486,7 +486,7 @@ elif page == "📋 Executive Report":
         st.components.v1.html(html, height=2000, scrolling=True)
 
         with open(report_path, 'rb') as f:
-            st.download_button("📥 Download Report", f.read(), "executive_report.html", "text/html")
+            st.download_button("Download Report", f.read(), "executive_report.html", "text/html")
     else:
         st.warning("Executive report not generated yet. Run the full pipeline.")
 
@@ -495,5 +495,5 @@ elif page == "📋 Executive Report":
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("Properties", f"{len(df):,}")
         c2.metric("Locations", f"{df['location'].nunique()}")
-        c3.metric("Avg Price", f"₹{df['price'].mean()/1e7:.2f}Cr")
+        c3.metric("Avg Price", f"Rs.{df['price'].mean()/1e7:.2f}Cr")
         c4.metric("Avg ROI", f"{df['roi'].mean():.1f}%")

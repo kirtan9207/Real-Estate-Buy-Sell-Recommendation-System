@@ -1,14 +1,14 @@
-# 🏗️ Real Estate Buy/Sell Recommendation System — Bangalore
+# Real Estate Buy/Sell Recommendation System — Bangalore
 
 A production-grade **Data Science project** that analyzes the Bangalore real estate market using machine learning. The system generates 20,000+ realistic property listings, trains multiple ML models, detects undervalued properties, matches buyer preferences, and provides buy/sell/hold investment signals through an interactive dashboard.
 
 ---
 
-## 🎯 Key Features
+## Key Features
 
 | Feature | Description |
 |---|---|
-| **Price Prediction** | XGBoost model with R² > 0.85 on 24 engineered features |
+| **Price Prediction** | XGBoost model with R2 > 0.85 on 24 engineered features |
 | **Undervalued Detection** | Identifies properties priced 10%+ below predicted value |
 | **Buyer Matching** | Cosine similarity-based preference matching engine |
 | **Buy/Sell Signals** | Trend-based investment signals (Buy/Hold/Sell/Wait) |
@@ -19,7 +19,7 @@ A production-grade **Data Science project** that analyzes the Bangalore real est
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 ├── data/
@@ -50,7 +50,7 @@ A production-grade **Data Science project** that analyzes the Bangalore real est
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
 ```bash
@@ -64,9 +64,9 @@ python run_pipeline.py
 
 This executes the entire pipeline:
 ```
-Data Generation → Cleaning → Feature Engineering → EDA →
-Baseline Models → Training → Evaluation → Clustering →
-Recommendations → Executive Report
+Data Generation -> Cleaning -> Feature Engineering -> EDA ->
+Baseline Models -> Training -> Evaluation -> Clustering ->
+Recommendations -> Executive Report
 ```
 
 ### 3. Launch Dashboard
@@ -83,7 +83,7 @@ uvicorn backend.app.main:app --reload --port 8000
 
 ---
 
-## 📊 Pipeline Stages
+## Pipeline Stages
 
 ### Stage 1: Data Generation
 - **20,000** property listings across **20 Bangalore localities**
@@ -118,7 +118,7 @@ uvicorn backend.app.main:app --reload --port 8000
 | XGBoost Signal | Classification | Buy/Hold/Sell/Wait |
 
 ### Stage 5: Evaluation
-- RMSE, MAE, MAPE, R² for all models
+- RMSE, MAE, MAPE, R2 for all models
 - 7 diagnostic plots (residuals, actual vs predicted, feature importance, etc.)
 - High-error segment analysis (top 5%)
 - Location-wise error comparison
@@ -131,13 +131,13 @@ uvicorn backend.app.main:app --reload --port 8000
 
 ---
 
-## 🗺️ Bangalore Locations (20)
+## Bangalore Locations (20)
 
 Whitefield, Indiranagar, Electronic City, Koramangala, HSR Layout, Sarjapur Road, Hebbal, Bannerghatta Road, Marathahalli, JP Nagar, Jayanagar, BTM Layout, Yelahanka, KR Puram, Rajajinagar, Malleswaram, Basavanagudi, Devanahalli, Kanakapura Road, Hennur
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **ML**: Python, Pandas, Scikit-learn, XGBoost
 - **Visualization**: Matplotlib, Seaborn, Plotly
@@ -146,7 +146,7 @@ Whitefield, Indiranagar, Electronic City, Koramangala, HSR Layout, Sarjapur Road
 
 ---
 
-## 📋 Output Artifacts
+## Output Artifacts
 
 | File | Description |
 |---|---|
