@@ -55,187 +55,187 @@ CBD_LAT, CBD_LON = 12.9716, 77.5946
 
 
 def haversine_km(lat1, lon1, lat2, lon2):
- """Approximate distance in km between two lat/lon points."""
- R = 6371
- dlat = np.radians(lat2 - lat1)
- dlon = np.radians(lon2 - lon1)
- a = np.sin(dlat / 2) ** 2 + np.cos(np.radians(lat1)) * np.cos(np.radians(lat2)) * np.sin(dlon / 2) ** 2
- return R * 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+    """Approximate distance in km between two lat/lon points."""
+    R = 6371
+    dlat = np.radians(lat2 - lat1)
+    dlon = np.radians(lon2 - lon1)
+    a = np.sin(dlat / 2) ** 2 + np.cos(np.radians(lat1)) * np.cos(np.radians(lat2)) * np.sin(dlon / 2) ** 2
+    return R * 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
 
 
 def generate_production_data(num_records=20000, seed=42):
- """Generate realistic Bangalore property dataset."""
- np.random.seed(seed)
- random.seed(seed)
+    """Generate realistic Bangalore property dataset."""
+    np.random.seed(seed)
+    random.seed(seed)
 
- data = []
- start_date = datetime(2020, 1, 1)
- location_names = list(LOCATIONS.keys())
+    data = []
+    start_date = datetime(2020, 1, 1)
+    location_names = list(LOCATIONS.keys())
 
- for i in range(num_records):
- loc_name = random.choice(location_names)
- loc = LOCATIONS[loc_name]
+    for i in range(num_records):
+        loc_name = random.choice(location_names)
+        loc = LOCATIONS[loc_name]
 
- # ── Property characteristics ──
- prop_type = random.choices(PROPERTY_TYPES, weights=PROPERTY_TYPE_WEIGHTS, k=1)[0]
+        # ── Property characteristics ──
+        prop_type = random.choices(PROPERTY_TYPES, weights=PROPERTY_TYPE_WEIGHTS, k=1)[0]
 
- if prop_type == 'Plot':
- sqft = random.randint(600, 3000)
- bedrooms = 0
- bathrooms = 0
- balconies = 0
- floor = 0
- total_floors = 0
- elif prop_type == 'Villa':
- sqft = random.randint(1800, 5000)
- bedrooms = random.randint(3, 5)
- bathrooms = random.randint(2, 4)
- balconies = random.randint(1, 3)
- floor = random.randint(1, 3)
- total_floors = random.randint(2, 4)
- elif prop_type == 'Penthouse':
- sqft = random.randint(2500, 5000)
- bedrooms = random.randint(3, 5)
- bathrooms = random.randint(3, 4)
- balconies = random.randint(2, 3)
- total_floors = random.randint(15, 30)
- floor = total_floors # Penthouse is top floor
- else: # Apartment, Builder Floor
- sqft = random.randint(500, 3000)
- bedrooms = random.randint(1, 3) if sqft < 1500 else random.randint(2, 5)
- bathrooms = max(1, bedrooms - random.randint(0, 1))
- balconies = random.randint(0, 2)
- total_floors = random.randint(3, 25)
- floor = random.randint(1, total_floors)
+        if prop_type == 'Plot':
+            sqft = random.randint(600, 3000)
+            bedrooms = 0
+            bathrooms = 0
+            balconies = 0
+            floor = 0
+            total_floors = 0
+        elif prop_type == 'Villa':
+            sqft = random.randint(1800, 5000)
+            bedrooms = random.randint(3, 5)
+            bathrooms = random.randint(2, 4)
+            balconies = random.randint(1, 3)
+            floor = random.randint(1, 3)
+            total_floors = random.randint(2, 4)
+        elif prop_type == 'Penthouse':
+            sqft = random.randint(2500, 5000)
+            bedrooms = random.randint(3, 5)
+            bathrooms = random.randint(3, 4)
+            balconies = random.randint(2, 3)
+            total_floors = random.randint(15, 30)
+            floor = total_floors  # Penthouse is top floor
+        else:  # Apartment, Builder Floor
+            sqft = random.randint(500, 3000)
+            bedrooms = random.randint(1, 3) if sqft < 1500 else random.randint(2, 5)
+            bathrooms = max(1, bedrooms - random.randint(0, 1))
+            balconies = random.randint(0, 2)
+            total_floors = random.randint(3, 25)
+            floor = random.randint(1, total_floors)
 
- parking = random.randint(0, 1) if prop_type in ['Apartment', 'Builder Floor'] else random.randint(1, 2)
- age = random.randint(0, 25)
- furnish = random.choices(FURNISHING, weights=FURNISHING_WEIGHTS, k=1)[0]
- listing_type = random.choices(LISTING_TYPES, weights=LISTING_TYPE_WEIGHTS, k=1)[0]
- builder = random.choice(BUILDERS)
- amenities = random.randint(2, 20)
+        parking = random.randint(0, 1) if prop_type in ['Apartment', 'Builder Floor'] else random.randint(1, 2)
+        age = random.randint(0, 25)
+        furnish = random.choices(FURNISHING, weights=FURNISHING_WEIGHTS, k=1)[0]
+        listing_type = random.choices(LISTING_TYPES, weights=LISTING_TYPE_WEIGHTS, k=1)[0]
+        builder = random.choice(BUILDERS)
+        amenities = random.randint(2, 20)
 
- # ── Distance features ──
- dist_metro = round(random.uniform(*loc['metro_dist_range']), 2)
- dist_school = round(random.uniform(0.2, 8.0), 2)
- dist_hospital = round(random.uniform(0.3, 10.0), 2)
+        # ── Distance features ──
+        dist_metro = round(random.uniform(*loc['metro_dist_range']), 2)
+        dist_school = round(random.uniform(0.2, 8.0), 2)
+        dist_hospital = round(random.uniform(0.3, 10.0), 2)
 
- lat = loc['lat'] + random.uniform(-0.015, 0.015)
- lon = loc['lon'] + random.uniform(-0.015, 0.015)
- dist_cbd = round(haversine_km(lat, lon, CBD_LAT, CBD_LON), 2)
+        lat = loc['lat'] + random.uniform(-0.015, 0.015)
+        lon = loc['lon'] + random.uniform(-0.015, 0.015)
+        dist_cbd = round(haversine_km(lat, lon, CBD_LAT, CBD_LON), 2)
 
- # ── Derived scores ──
- connectivity = round(max(1.0, 10.0 - (dist_metro * 0.4 + dist_cbd * 0.15)), 1)
- safety = random.randint(5, 10)
- school_sc = random.randint(4, 10)
+        # ── Derived scores ──
+        connectivity = round(max(1.0, 10.0 - (dist_metro * 0.4 + dist_cbd * 0.15)), 1)
+        safety = random.randint(5, 10)
+        school_sc = random.randint(4, 10)
 
- # ── Price computation ──
- ppsqft = loc['base_price']
+        # ── Price computation ──
+        ppsqft = loc['base_price']
 
- # Age adjustment
- if age == 0:
- ppsqft *= 1.20 # Under-construction premium
- elif age <= 2:
- ppsqft *= 1.12
- elif age <= 5:
- ppsqft *= 1.0
- elif age <= 10:
- ppsqft *= 0.92
- elif age <= 15:
- ppsqft *= 0.85
- else:
- ppsqft *= 0.78
+        # Age adjustment
+        if age == 0:
+            ppsqft *= 1.20  # Under-construction premium
+        elif age <= 2:
+            ppsqft *= 1.12
+        elif age <= 5:
+            ppsqft *= 1.0
+        elif age <= 10:
+            ppsqft *= 0.92
+        elif age <= 15:
+            ppsqft *= 0.85
+        else:
+            ppsqft *= 0.78
 
- # Property type multiplier
- type_mult = {'Apartment': 1.0, 'Villa': 1.35, 'Penthouse': 1.55, 'Builder Floor': 0.95, 'Plot': 0.70}
- ppsqft *= type_mult[prop_type]
+        # Property type multiplier
+        type_mult = {'Apartment': 1.0, 'Villa': 1.35, 'Penthouse': 1.55, 'Builder Floor': 0.95, 'Plot': 0.70}
+        ppsqft *= type_mult[prop_type]
 
- # Furnishing premium
- furnish_mult = {'Unfurnished': 1.0, 'Semi-furnished': 1.08, 'Fully-furnished': 1.18}
- ppsqft *= furnish_mult[furnish]
+        # Furnishing premium
+        furnish_mult = {'Unfurnished': 1.0, 'Semi-furnished': 1.08, 'Fully-furnished': 1.18}
+        ppsqft *= furnish_mult[furnish]
 
- base_price = sqft * ppsqft
- base_price += bedrooms * 350000
- base_price += amenities * 120000
- base_price += balconies * 150000
- base_price += parking * 300000
+        base_price = sqft * ppsqft
+        base_price += bedrooms * 350000
+        base_price += amenities * 120000
+        base_price += balconies * 150000
+        base_price += parking * 300000
 
- # Metro proximity premium
- if dist_metro < 1.0:
- base_price *= 1.15
- elif dist_metro < 2.0:
- base_price *= 1.08
- elif dist_metro < 3.0:
- base_price *= 1.03
+        # Metro proximity premium
+        if dist_metro < 1.0:
+            base_price *= 1.15
+        elif dist_metro < 2.0:
+            base_price *= 1.08
+        elif dist_metro < 3.0:
+            base_price *= 1.03
 
- # High-floor premium for apartments
- if prop_type in ['Apartment', 'Penthouse'] and floor > 10:
- base_price *= 1.05
+        # High-floor premium for apartments
+        if prop_type in ['Apartment', 'Penthouse'] and floor > 10:
+            base_price *= 1.05
 
- # Builder reputation factor
- premium_builders = ['Prestige Group', 'Sobha Ltd', 'Godrej Properties', 'Brigade Group']
- if builder in premium_builders:
- base_price *= 1.06
+        # Builder reputation factor
+        premium_builders = ['Prestige Group', 'Sobha Ltd', 'Godrej Properties', 'Brigade Group']
+        if builder in premium_builders:
+            base_price *= 1.06
 
- # Market noise (±10%)
- actual_price = int(base_price * random.uniform(0.90, 1.10))
+        # Market noise (±10%)
+        actual_price = int(base_price * random.uniform(0.90, 1.10))
 
- # ── Market features ──
- roi = round((loc['growth'] * 100) + random.uniform(-3, 4), 2)
- roi = max(3.0, roi) # Floor at 3%
- demand_score = random.randint(30, 98)
- liquidity_score = random.randint(25, 95)
- market_trend = round(loc['growth'] + random.uniform(-0.03, 0.03), 4)
- market_trend = max(0.03, market_trend)
+        # ── Market features ──
+        roi = round((loc['growth'] * 100) + random.uniform(-3, 4), 2)
+        roi = max(3.0, roi)  # Floor at 3%
+        demand_score = random.randint(30, 98)
+        liquidity_score = random.randint(25, 95)
+        market_trend = round(loc['growth'] + random.uniform(-0.03, 0.03), 4)
+        market_trend = max(0.03, market_trend)
 
- listing_date = start_date + timedelta(days=random.randint(0, 1825)) # 5 years
+        listing_date = start_date + timedelta(days=random.randint(0, 1825))  # 5 years
 
- data.append({
- 'property_id': f"BLR-{i + 10001}",
- 'location': loc_name,
- 'latitude': round(lat, 6),
- 'longitude': round(lon, 6),
- 'builder_name': builder,
- 'property_type': prop_type,
- 'furnishing': furnish,
- 'listing_type': listing_type,
- 'sqft': sqft,
- 'bedrooms': bedrooms,
- 'bathrooms': bathrooms,
- 'balconies': balconies,
- 'parking': parking,
- 'floor': floor,
- 'total_floors': total_floors,
- 'age': age,
- 'amenities_count': amenities,
- 'distance_metro': dist_metro,
- 'distance_school': dist_school,
- 'distance_hospital': dist_hospital,
- 'distance_cbd': dist_cbd,
- 'connectivity_score': connectivity,
- 'safety_score': safety,
- 'school_score': school_sc,
- 'price': actual_price,
- 'demand_score': demand_score,
- 'liquidity_score': liquidity_score,
- 'roi': roi,
- 'market_trend': market_trend,
- 'listing_date': listing_date.strftime('%Y-%m-%d'),
- })
+        data.append({
+            'property_id': f"BLR-{i + 10001}",
+            'location': loc_name,
+            'latitude': round(lat, 6),
+            'longitude': round(lon, 6),
+            'builder_name': builder,
+            'property_type': prop_type,
+            'furnishing': furnish,
+            'listing_type': listing_type,
+            'sqft': sqft,
+            'bedrooms': bedrooms,
+            'bathrooms': bathrooms,
+            'balconies': balconies,
+            'parking': parking,
+            'floor': floor,
+            'total_floors': total_floors,
+            'age': age,
+            'amenities_count': amenities,
+            'distance_metro': dist_metro,
+            'distance_school': dist_school,
+            'distance_hospital': dist_hospital,
+            'distance_cbd': dist_cbd,
+            'connectivity_score': connectivity,
+            'safety_score': safety,
+            'school_score': school_sc,
+            'price': actual_price,
+            'demand_score': demand_score,
+            'liquidity_score': liquidity_score,
+            'roi': roi,
+            'market_trend': market_trend,
+            'listing_date': listing_date.strftime('%Y-%m-%d'),
+        })
 
- df = pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
- # Save raw data
- os.makedirs('data/raw', exist_ok=True)
- output_path = 'data/raw/bangalore_properties.csv'
- df.to_csv(output_path, index=False)
+    # Save raw data
+    os.makedirs('data/raw', exist_ok=True)
+    output_path = 'data/raw/bangalore_properties.csv'
+    df.to_csv(output_path, index=False)
 
- print(f" Generated {num_records} Bangalore property records")
- print(f" Locations: {df['location'].nunique()}")
- print(f" Price range: ₹{df['price'].min():,.0f} — ₹{df['price'].max():,.0f}")
- print(f" Saved to: {output_path}")
- return df
+    print(f" Generated {num_records} Bangalore property records")
+    print(f" Locations: {df['location'].nunique()}")
+    print(f" Price range: ₹{df['price'].min():,.0f} — ₹{df['price'].max():,.0f}")
+    print(f" Saved to: {output_path}")
+    return df
 
 
 if __name__ == '__main__':
- generate_production_data()
+    generate_production_data()
