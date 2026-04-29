@@ -1,0 +1,57 @@
+{
+  "model_metrics": {
+    "Linear Regression": {
+      "rmse": 9001250.97,
+      "mae": 6032683.47,
+      "mape": 33.55,
+      "r2": 0.7643
+    },
+    "Decision Tree": {
+      "rmse": 5260428.71,
+      "mae": 3239066.0,
+      "mape": 13.8,
+      "r2": 0.9195
+    },
+    "Random Forest": {
+      "rmse": 3573000.96,
+      "mae": 2173074.91,
+      "mape": 9.08,
+      "r2": 0.9629
+    },
+    "XGBoost": {
+      "rmse": 2639185.21,
+      "mae": 1570621.23,
+      "mape": 6.31,
+      "r2": 0.9797
+    }
+  },
+  "best_model": "XGBoost",
+  "best_r2": 0.9797,
+  "high_error_analysis": {
+    "count": 193,
+    "threshold": 5035017.0,
+    "by_location": {
+      "Indiranagar": 31,
+      "HSR Layout": 22,
+      "Koramangala": 21,
+      "Jayanagar": 15,
+      "Malleswaram": 15,
+      "Whitefield": 10,
+      "Hebbal": 10,
+      "Rajajinagar": 10,
+      "Basavanagudi": 10,
+      "BTM Layout": 9
+    },
+    "by_property_type": {
+      "Villa": 100,
+      "Penthouse": 52,
+      "Apartment": 30,
+      "Builder Floor": 10,
+      "Plot": 1
+    }
+  },
+  "residual_stats": {
+    "mean": 152735.36,
+    "std": 2634761.94
+  }
+}

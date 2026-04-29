@@ -1,6 +1,5 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, text
 from pydantic import BaseModel
 import pandas as pd
 import pickle
@@ -8,9 +7,8 @@ import os
 import numpy as np
 from typing import Dict, List, Optional
 
-app = FastAPI(title="Real Estate Intelligence Platform API")
+app = FastAPI(title="Bangalore Real Estate Intelligence Platform API")
 
-# Update CORS for all origins (Production Ready)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,144 +17,163 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Use inside Docker via 'db' hostname or localhost for testing
-DB_URL = os.getenv("DATABASE_URL", "postgresql://user:password@db:5432/real_estate")
-engine = create_engine(DB_URL)
-
-# Models
+# ─── File paths (CSV-based, no DB required) ──────────────
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DATA_PATH = os.path.join(BASE_DIR, "data/processed/production_final.csv")
 MODEL_DIR = os.path.join(BASE_DIR, "ml/models")
+
+
+def load_data():
+    """Load production data (CSV fallback — no database needed)."""
+    if os.path.exists(DATA_PATH):
+        return pd.read_csv(DATA_PATH)
+    raise HTTPException(status_code=500, detail="Data not found. Run python run_pipeline.py first.")
+
 
 def get_model(name: str):
     path = os.path.join(MODEL_DIR, f"{name}.pkl")
     if not os.path.exists(path):
-        raise HTTPException(status_code=500, detail=f"Model {name} missing")
+        raise HTTPException(status_code=500, detail=f"Model {name} not found. Run pipeline first.")
     with open(path, 'rb') as f:
         return pickle.load(f)
 
-# Request Models
+
 class ValuationInput(BaseModel):
     sqft: int
     bedrooms: int
     bathrooms: int
-    age: int
-    amenities: int
-    metro_dist: float
-    location_id: int
-    builder_id: int
-    type_id: int
-    furnish_id: int
-    listing_type_id: int
-    q_score: float
+    balconies: int = 1
+    parking: int = 1
+    age: int = 3
+    floor: int = 5
+    total_floors: int = 15
+    amenities: int = 8
+    distance_metro: float = 2.0
+    distance_school: float = 1.5
+    distance_hospital: float = 2.0
+    distance_cbd: float = 10.0
+    location: str = "Whitefield"
+    property_type: str = "Apartment"
+    furnishing: str = "Semi-furnished"
+    listing_type: str = "Ready to Move"
+
 
 @app.get("/")
 def health_check():
-    return {"status": "operational", "version": "SaaS-2.1.0"}
+    return {"status": "operational", "version": "3.0.0", "city": "Bangalore"}
+
 
 @app.post("/predict")
-def generate_valuation_report(req: ValuationInput):
-    price_model = get_model("price_model")
-    roi_model = get_model("roi_model")
-    signal_model = get_model("signal")
-    
-    # Feature vector construction (must matches train order)
+def predict_price(req: ValuationInput):
+    model = get_model("price_model")
+    encoders = get_model("encoders")
+
+    # Compute derived features
+    connectivity = max(1.0, 10.0 - (req.distance_metro * 0.4 + req.distance_cbd * 0.15))
+    loc_score = connectivity * 0.4 + 7 * 0.3 + 7 * 0.3
+    amenity_idx = req.amenities / 20.0
+    furnish_map = {'Unfurnished': 0, 'Semi-furnished': 1, 'Fully-furnished': 2}
+    furnish_num = furnish_map.get(req.furnishing, 1)
+    luxury = ((req.sqft / 5000) * 0.3 + (req.amenities / 20) * 0.25 +
+              (furnish_num / 2) * 0.2 + (req.balconies / 3) * 0.15 + (req.parking / 2) * 0.1)
+    dist_comp = req.distance_metro * 0.35 + req.distance_school * 0.2 + req.distance_hospital * 0.2 + req.distance_cbd * 0.25
+    prox = max(0, (15 - dist_comp) / 15 * 10)
+    age_bucket = 0 if req.age <= 2 else 1 if req.age <= 5 else 2 if req.age <= 10 else 3 if req.age <= 20 else 4
+
+    loc_enc = encoders['location'].transform([req.location])[0] if req.location in encoders['location'].classes_ else 0
+    type_enc = encoders['property_type'].transform([req.property_type])[0] if req.property_type in encoders['property_type'].classes_ else 0
+    furnish_enc = encoders['furnishing'].transform([req.furnishing])[0] if req.furnishing in encoders['furnishing'].classes_ else 0
+    listing_enc = encoders['listing_type'].transform([req.listing_type])[0] if req.listing_type in encoders['listing_type'].classes_ else 0
+
     features = [
-        req.sqft, req.bedrooms, req.bathrooms, req.age, req.amenities, req.metro_dist,
-        req.location_id, req.builder_id, req.type_id, req.furnish_id, req.listing_type_id,
-        8.5, req.q_score, 1 # Placeholders
+        req.sqft, req.bedrooms, req.bathrooms, req.balconies, req.parking,
+        req.age, req.floor, req.total_floors, req.amenities,
+        req.distance_metro, req.distance_school, req.distance_hospital, req.distance_cbd,
+        loc_score, luxury, amenity_idx, prox,
+        age_bucket, furnish_num,
+        loc_enc, 0, type_enc, furnish_enc, listing_enc
     ]
-    
-    price = int(price_model.predict([features])[0])
-    roi = round(float(roi_model.predict([features])[0]), 2)
-    signal_idx = int(signal_model.predict([features])[0])
-    
-    labels = ["Buy (Growth)", "Hold (Rising)", "Sell (Peak)", "Wait (Correction)"]
-    signal = labels[signal_idx]
-    
+
+    price = int(model.predict([features])[0])
+
+    # ROI prediction
+    try:
+        roi_model = get_model("roi_model")
+        roi = round(float(roi_model.predict([features])[0]), 2)
+    except:
+        roi = 12.0
+
+    # Signal
+    try:
+        signal_model = get_model("signal_model")
+        signal_idx = int(signal_model.predict([features])[0])
+        labels = ["BUY (Growth)", "HOLD (Steady)", "SELL (Peak)", "WAIT (Correction)"]
+        signal = labels[signal_idx]
+    except:
+        signal = "HOLD"
+
     return {
         "valuation": {
             "predicted_price": price,
-            "price_range": [int(price * 0.95), int(price * 1.05)],
-            "confidence_score": 0.98,
+            "price_range": [int(price * 0.92), int(price * 1.08)],
             "roi_forecast": roi,
-            "appreciation_5y": f"+{round(roi * 5, 2)}%"
         },
         "investment": {
             "signal": signal,
-            "segment": "Premium" if price > 15000000 else "Mid-range",
-            "recommended_action": "ENTER" if "Buy" in signal else ("EXIT" if "Sell" in signal else "NEUTRAL")
+            "segment": "Premium" if price > 15000000 else "Mid-range" if price > 6000000 else "Budget",
         }
     }
 
+
 @app.get("/market-stats")
 def market_stats():
-    try:
-        with engine.connect() as conn:
-            summary = pd.read_sql(text("SELECT * FROM market_summary LIMIT 1"), conn)
-            locations = pd.read_sql(text("SELECT location, price, roi, market_trend FROM location_stats"), conn)
-            clusters = pd.read_sql(text("SELECT segment_label, AVG(price) as avg_price FROM location_stats GROUP BY segment_label"), conn)
-            
-            if summary.empty:
-                return {"error": "Database not populated. Run run-data-pipeline.sh."}
-            
-            s = summary.iloc[0].to_dict()
-            return {
-                "kpis": {
-                    "avg_price": s['avg_price'],
-                    "total_assets": s['total_assets'],
-                    "undervalued_count": s['undervalued_count'],
-                    "market_growth": s['market_growth'],
-                    "high_roi_region": s['best_roi_location']
-                },
-                "trends": locations.to_dict('records'),
-                "clusters": clusters.set_index('segment_label')['avg_price'].to_dict()
-            }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    df = load_data()
+    loc_stats = df.groupby('location').agg(
+        price=('price', 'mean'), roi=('roi', 'mean'), market_trend=('market_trend', 'mean')
+    ).reset_index()
+
+    return {
+        "kpis": {
+            "avg_price": int(df['price'].mean()),
+            "total_assets": len(df),
+            "undervalued_count": int(len(df[df.get('valuation_label', pd.Series(dtype=str)) == 'Underpriced'])) if 'valuation_label' in df.columns else 0,
+            "market_growth": f"+{df['market_trend'].mean()*100:.1f}%",
+            "high_roi_region": df.groupby('location')['roi'].mean().idxmax()
+        },
+        "trends": loc_stats.to_dict('records'),
+    }
+
 
 @app.get("/locations")
 def location_intel():
-    try:
-        with engine.connect() as conn:
-            df = pd.read_sql(text("SELECT * FROM location_stats"), conn)
-            return df.to_dict('records')
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    df = load_data()
+    return df.groupby('location').agg(
+        price=('price', 'mean'), roi=('roi', 'mean'),
+        latitude=('latitude', 'mean'), longitude=('longitude', 'mean'),
+        market_trend=('market_trend', 'mean'), demand_score=('demand_score', 'mean'),
+        count=('property_id', 'count')
+    ).reset_index().to_dict('records')
+
 
 @app.get("/undervalued")
 def undervalued_assets():
-    try:
-        with engine.connect() as conn:
-            df = pd.read_sql(text("SELECT * FROM properties WHERE roi > 18 ORDER BY roi DESC LIMIT 20"), conn)
-            return df.to_dict('records')
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    df = load_data()
+    if 'valuation_label' in df.columns:
+        uv = df[df['valuation_label'] == 'Underpriced'].sort_values('price_gap_pct').head(20)
+        return uv.to_dict('records')
+    return df.nlargest(20, 'roi').to_dict('records')
 
-@app.get("/roi")
-def roi_intel(property_id: str):
-    try:
-        with engine.connect() as conn:
-            df = pd.read_sql(text("SELECT roi, market_trend, luxury_score FROM properties WHERE property_id = :pid"), conn, params={'pid': property_id})
-            if df.empty: return {}
-            p = df.iloc[0]
-            return {
-                "expected_roi": round(p['roi'], 2),
-                "appreciation_trend": "Rising" if p['market_trend'] > 0.1 else "Stable",
-                "rental_yield": round(p['roi'] * 0.25, 2),
-                "investment_score": round(p['luxury_score'] * 10, 1)
-            }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/sell-signal")
 def sell_signal(property_id: str):
-    try:
-        with engine.connect() as conn:
-            df = pd.read_sql(text("SELECT market_trend FROM properties WHERE property_id = :pid"), conn, params={'pid': property_id})
-            if df.empty: return {"signal": "HOLD", "explanation": "Neutral trend data available."}
-            trend = df.iloc[0]['market_trend']
-            if trend > 0.14: return {"signal": "SELL", "explanation": "Model predicts peak market valuation reached."}
-            elif trend < 0.08: return {"signal": "BUY", "explanation": "Local market dip detected. High long-term alpha."}
-            else: return {"signal": "HOLD", "explanation": "Steady appreciation continues. Momentum target at +15%."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    df = load_data()
+    prop = df[df['property_id'] == property_id]
+    if prop.empty:
+        return {"signal": "HOLD", "explanation": "Property not found."}
+    p = prop.iloc[0]
+    trend = p['market_trend']
+    if trend > 0.14:
+        return {"signal": "BUY", "explanation": f"High growth trend ({trend*100:.1f}%). Strong buy opportunity."}
+    elif trend < 0.07:
+        return {"signal": "SELL", "explanation": f"Slowing growth ({trend*100:.1f}%). Consider selling at current valuation."}
+    return {"signal": "HOLD", "explanation": f"Steady growth ({trend*100:.1f}%). Continue holding for appreciation."}

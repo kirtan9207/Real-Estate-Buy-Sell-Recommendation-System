@@ -13,3 +13,9 @@ python-multipart
 pydantic
 requests
 python-dotenv
+streamlit
+folium
+streamlit-folium
+plotly
+scipy
+joblib

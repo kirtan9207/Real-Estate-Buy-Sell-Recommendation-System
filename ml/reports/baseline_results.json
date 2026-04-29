@@ -1,0 +1,48 @@
+{
+  "global_mean": {
+    "strategy": "Predict mean price for all properties",
+    "predicted_value": 24071918.24,
+    "rmse": 18144281.76,
+    "mae": 12883330.28,
+    "r2": 0.0
+  },
+  "global_median": {
+    "strategy": "Predict median price for all properties",
+    "predicted_value": 18771609.0,
+    "rmse": 18902598.73,
+    "mae": 12082285.84,
+    "r2": -0.0853
+  },
+  "location_mean": {
+    "strategy": "Predict location-specific mean price",
+    "location_means": {
+      "BTM Layout": 24781873.44,
+      "Bannerghatta Road": 17678783.38,
+      "Basavanagudi": 28564053.87,
+      "Devanahalli": 12955203.37,
+      "Electronic City": 16008088.15,
+      "HSR Layout": 28290519.69,
+      "Hebbal": 24735929.21,
+      "Hennur": 16850268.13,
+      "Indiranagar": 45842279.13,
+      "JP Nagar": 23038618.46,
+      "Jayanagar": 36642200.51,
+      "KR Puram": 14153610.51,
+      "Kanakapura Road": 15158984.03,
+      "Koramangala": 35972655.27,
+      "Malleswaram": 32688067.67,
+      "Marathahalli": 21148644.93,
+      "Rajajinagar": 30690925.57,
+      "Sarjapur Road": 19252269.58,
+      "Whitefield": 22764864.71,
+      "Yelahanka": 14896327.86
+    },
+    "rmse": 15934028.38,
+    "mae": 10895025.58,
+    "r2": 0.2288
+  },
+  "comparison": {
+    "best_baseline": "location_mean",
+    "note": "Any ML model must beat the best baseline to be useful."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "features": [
+    "sqft",
+    "bedrooms",
+    "bathrooms",
+    "balconies",
+    "parking",
+    "age",
+    "floor",
+    "total_floors",
+    "amenities_count",
+    "distance_metro",
+    "distance_school",
+    "distance_hospital",
+    "distance_cbd",
+    "location_score",
+    "luxury_score",
+    "amenity_index",
+    "proximity_score",
+    "age_bucket",
+    "furnish_numeric",
+    "location_encoded",
+    "builder_name_encoded",
+    "property_type_encoded",
+    "furnishing_encoded",
+    "listing_type_encoded"
+  ],
+  "train_size": 15426,
+  "test_size": 3857,
+  "results": {
+    "linear_regression": {
+      "rmse": 9001250.97,
+      "mae": 6032683.47,
+      "r2": 0.7643
+    },
+    "decision_tree": {
+      "rmse": 5260428.71,
+      "mae": 3239066.0,
+      "r2": 0.9195
+    },
+    "random_forest": {
+      "rmse": 3573000.96,
+      "mae": 2173074.91,
+      "r2": 0.9629
+    },
+    "xgboost": {
+      "rmse": 2639185.14,
+      "mae": 1570621.25,
+      "r2": 0.9797
+    },
+    "roi_model": {
+      "rmse": 2.12,
+      "mae": 1.81,
+      "r2": 0.7316
+    },
+    "signal_classifier": {
+      "accuracy": 0.5888,
+      "labels": {
+        "0": "BUY",
+        "1": "HOLD",
+        "2": "SELL",
+        "3": "WAIT"
+      }
+    }
+  },
+  "best_model": "xgboost",
+  "best_r2": 0.9797
+}

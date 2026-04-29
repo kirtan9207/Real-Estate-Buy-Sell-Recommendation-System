@@ -6,16 +6,6 @@ venv/
 .venv/
 .env
 
-# Data
-data/raw/*.csv
-data/processed/*.csv
-data/logs/*.txt
-
-# ML
-ml/models/*.pkl
-ml/reports/assets/
-ml/reports/*.html
-
 # Node
 node_modules/
 dist/
@@ -27,3 +17,6 @@ Thumbs.db
 
 # Large files
 *.log
+
+# Large model files (too big for GitHub)
+ml/models/random_forest.pkl

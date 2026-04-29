@@ -1,0 +1,63 @@
+{
+  "n_clusters": 4,
+  "silhouette_scores": {
+    "2": 0.2153,
+    "3": 0.2132,
+    "4": 0.1997,
+    "5": 0.1853,
+    "6": 0.1888,
+    "7": 0.1824,
+    "8": 0.1707
+  },
+  "final_silhouette": 0.1997,
+  "segment_summary": {
+    "avg_price": {
+      "Budget": 14952046.23,
+      "Emerging High-Growth": 57773171.99,
+      "Mid-range": 20750731.56,
+      "Premium": 20842889.83
+    },
+    "median_price": {
+      "Budget": 13461796.0,
+      "Emerging High-Growth": 52889178.5,
+      "Mid-range": 19261236.5,
+      "Premium": 19156159.5
+    },
+    "count": {
+      "Budget": 6073,
+      "Emerging High-Growth": 2668,
+      "Mid-range": 5312,
+      "Premium": 5230
+    },
+    "avg_roi": {
+      "Budget": 15.61,
+      "Emerging High-Growth": 9.7,
+      "Mid-range": 9.66,
+      "Premium": 10.06
+    },
+    "avg_location_score": {
+      "Budget": 6.1,
+      "Emerging High-Growth": 7.49,
+      "Mid-range": 7.6,
+      "Premium": 7.62
+    },
+    "avg_luxury_score": {
+      "Budget": 0.44,
+      "Emerging High-Growth": 0.64,
+      "Mid-range": 0.4,
+      "Premium": 0.4
+    },
+    "avg_demand_score": {
+      "Budget": 63.04,
+      "Emerging High-Growth": 63.61,
+      "Mid-range": 45.83,
+      "Premium": 82.8
+    }
+  },
+  "label_map": {
+    "2": "Budget",
+    "0": "Mid-range",
+    "3": "Premium",
+    "1": "Emerging High-Growth"
+  }
+}

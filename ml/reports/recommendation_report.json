@@ -1,0 +1,387 @@
+{
+  "valuation": {
+    "underpriced_count": 356,
+    "overpriced_count": 418,
+    "fair_value_count": 18509,
+    "top_underpriced": [
+      {
+        "property_id": "BLR-21819",
+        "location": "KR Puram",
+        "price": 28264258,
+        "predicted_price": 44506860.0,
+        "price_gap_pct": -36.49,
+        "sqft": 3999,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-25280",
+        "location": "Hennur",
+        "price": 37962454,
+        "predicted_price": 55191496.0,
+        "price_gap_pct": -31.22,
+        "sqft": 4441,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-14751",
+        "location": "Bannerghatta Road",
+        "price": 32805936,
+        "predicted_price": 42595732.0,
+        "price_gap_pct": -22.98,
+        "sqft": 3618,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-27626",
+        "location": "Basavanagudi",
+        "price": 9253619,
+        "predicted_price": 11853808.0,
+        "price_gap_pct": -21.94,
+        "sqft": 678,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-17374",
+        "location": "Hennur",
+        "price": 21264489,
+        "predicted_price": 27214422.0,
+        "price_gap_pct": -21.86,
+        "sqft": 1866,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-24300",
+        "location": "Hebbal",
+        "price": 56539556,
+        "predicted_price": 72287940.0,
+        "price_gap_pct": -21.79,
+        "sqft": 4514,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-12534",
+        "location": "KR Puram",
+        "price": 9928322,
+        "predicted_price": 12660569.0,
+        "price_gap_pct": -21.58,
+        "sqft": 1438,
+        "bedrooms": 2
+      },
+      {
+        "property_id": "BLR-29813",
+        "location": "KR Puram",
+        "price": 14123278,
+        "predicted_price": 17947844.0,
+        "price_gap_pct": -21.31,
+        "sqft": 1848,
+        "bedrooms": 2
+      },
+      {
+        "property_id": "BLR-26086",
+        "location": "Bannerghatta Road",
+        "price": 42610068,
+        "predicted_price": 53871330.0,
+        "price_gap_pct": -20.9,
+        "sqft": 4595,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-23186",
+        "location": "JP Nagar",
+        "price": 18537196,
+        "predicted_price": 23431004.0,
+        "price_gap_pct": -20.89,
+        "sqft": 1595,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-14142",
+        "location": "Hennur",
+        "price": 5300811,
+        "predicted_price": 6592671.5,
+        "price_gap_pct": -19.6,
+        "sqft": 706,
+        "bedrooms": 0
+      },
+      {
+        "property_id": "BLR-16591",
+        "location": "Bannerghatta Road",
+        "price": 5074357,
+        "predicted_price": 6304038.5,
+        "price_gap_pct": -19.51,
+        "sqft": 526,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-11685",
+        "location": "Devanahalli",
+        "price": 14337959,
+        "predicted_price": 17711884.0,
+        "price_gap_pct": -19.05,
+        "sqft": 2447,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-27207",
+        "location": "BTM Layout",
+        "price": 8289030,
+        "predicted_price": 10225079.0,
+        "price_gap_pct": -18.93,
+        "sqft": 682,
+        "bedrooms": 2
+      },
+      {
+        "property_id": "BLR-25966",
+        "location": "JP Nagar",
+        "price": 7438747,
+        "predicted_price": 9153710.0,
+        "price_gap_pct": -18.74,
+        "sqft": 845,
+        "bedrooms": 0
+      },
+      {
+        "property_id": "BLR-17401",
+        "location": "Basavanagudi",
+        "price": 9105390,
+        "predicted_price": 11181523.0,
+        "price_gap_pct": -18.57,
+        "sqft": 822,
+        "bedrooms": 0
+      },
+      {
+        "property_id": "BLR-13013",
+        "location": "JP Nagar",
+        "price": 19515386,
+        "predicted_price": 23961948.0,
+        "price_gap_pct": -18.56,
+        "sqft": 1602,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-10992",
+        "location": "BTM Layout",
+        "price": 7687150,
+        "predicted_price": 9427400.0,
+        "price_gap_pct": -18.46,
+        "sqft": 606,
+        "bedrooms": 2
+      },
+      {
+        "property_id": "BLR-10219",
+        "location": "JP Nagar",
+        "price": 8374510,
+        "predicted_price": 10266637.0,
+        "price_gap_pct": -18.43,
+        "sqft": 777,
+        "bedrooms": 2
+      },
+      {
+        "property_id": "BLR-29768",
+        "location": "JP Nagar",
+        "price": 13595381,
+        "predicted_price": 16641030.0,
+        "price_gap_pct": -18.3,
+        "sqft": 1776,
+        "bedrooms": 4
+      }
+    ],
+    "top_overpriced": [
+      {
+        "property_id": "BLR-22722",
+        "location": "HSR Layout",
+        "price": 100261375,
+        "predicted_price": 66330932.0,
+        "price_gap_pct": 51.15,
+        "sqft": 4633,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-17234",
+        "location": "HSR Layout",
+        "price": 60868835,
+        "predicted_price": 40615796.0,
+        "price_gap_pct": 49.86,
+        "sqft": 4578,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-24591",
+        "location": "HSR Layout",
+        "price": 68126884,
+        "predicted_price": 49661416.0,
+        "price_gap_pct": 37.18,
+        "sqft": 4214,
+        "bedrooms": 4
+      },
+      {
+        "property_id": "BLR-12110",
+        "location": "HSR Layout",
+        "price": 35075753,
+        "predicted_price": 25972896.0,
+        "price_gap_pct": 35.05,
+        "sqft": 2011,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-25587",
+        "location": "HSR Layout",
+        "price": 27457038,
+        "predicted_price": 21193746.0,
+        "price_gap_pct": 29.55,
+        "sqft": 1377,
+        "bedrooms": 2
+      },
+      {
+        "property_id": "BLR-19324",
+        "location": "Yelahanka",
+        "price": 5937800,
+        "predicted_price": 4669029.5,
+        "price_gap_pct": 27.17,
+        "sqft": 790,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-21877",
+        "location": "HSR Layout",
+        "price": 22943511,
+        "predicted_price": 18098312.0,
+        "price_gap_pct": 26.77,
+        "sqft": 1855,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-21833",
+        "location": "HSR Layout",
+        "price": 84411182,
+        "predicted_price": 66796860.0,
+        "price_gap_pct": 26.37,
+        "sqft": 4286,
+        "bedrooms": 4
+      },
+      {
+        "property_id": "BLR-27551",
+        "location": "Hebbal",
+        "price": 6414362,
+        "predicted_price": 5080164.0,
+        "price_gap_pct": 26.26,
+        "sqft": 1030,
+        "bedrooms": 0
+      },
+      {
+        "property_id": "BLR-28583",
+        "location": "Indiranagar",
+        "price": 155205612,
+        "predicted_price": 123932290.0,
+        "price_gap_pct": 25.23,
+        "sqft": 4546,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-17703",
+        "location": "HSR Layout",
+        "price": 35259756,
+        "predicted_price": 28356088.0,
+        "price_gap_pct": 24.35,
+        "sqft": 2982,
+        "bedrooms": 3
+      },
+      {
+        "property_id": "BLR-18846",
+        "location": "Koramangala",
+        "price": 19611776,
+        "predicted_price": 15922796.0,
+        "price_gap_pct": 23.17,
+        "sqft": 959,
+        "bedrooms": 1
+      },
+      {
+        "property_id": "BLR-20256",
+        "location": "HSR Layout",
+        "price": 61351447,
+        "predicted_price": 49838216.0,
+        "price_gap_pct": 23.1,
+        "sqft": 2817,
+        "bedrooms": 4
+      },
+      {
+        "property_id": "BLR-18273",
+        "location": "Jayanagar",
+        "price": 16838605,
+        "predicted_price": 13744999.0,
+        "price_gap_pct": 22.51,
+        "sqft": 808,
+        "bedrooms": 2
+      },
+      {
+        "property_id": "BLR-16091",
+        "location": "Electronic City",
+        "price": 40536225,
+        "predicted_price": 33104416.0,
+        "price_gap_pct": 22.45,
+        "sqft": 3400,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-11029",
+        "location": "HSR Layout",
+        "price": 24528272,
+        "predicted_price": 20093940.0,
+        "price_gap_pct": 22.07,
+        "sqft": 2169,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-15530",
+        "location": "Electronic City",
+        "price": 40802120,
+        "predicted_price": 33444820.0,
+        "price_gap_pct": 22.0,
+        "sqft": 3656,
+        "bedrooms": 4
+      },
+      {
+        "property_id": "BLR-19351",
+        "location": "Basavanagudi",
+        "price": 53759382,
+        "predicted_price": 44350492.0,
+        "price_gap_pct": 21.21,
+        "sqft": 3471,
+        "bedrooms": 4
+      },
+      {
+        "property_id": "BLR-19368",
+        "location": "HSR Layout",
+        "price": 79750088,
+        "predicted_price": 65804804.0,
+        "price_gap_pct": 21.19,
+        "sqft": 4865,
+        "bedrooms": 5
+      },
+      {
+        "property_id": "BLR-27572",
+        "location": "Malleswaram",
+        "price": 18571050,
+        "predicted_price": 15336976.0,
+        "price_gap_pct": 21.09,
+        "sqft": 1078,
+        "bedrooms": 1
+      }
+    ]
+  },
+  "sell_signal_distribution": {
+    "BUY": 6928,
+    "SELL": 5247,
+    "STRONG BUY": 3527,
+    "HOLD": 1981,
+    "STRONG SELL": 1600
+  },
+  "matching_features": [
+    "bedrooms",
+    "sqft",
+    "location_score",
+    "amenity_index",
+    "luxury_score",
+    "proximity_score",
+    "price"
+  ]
+}

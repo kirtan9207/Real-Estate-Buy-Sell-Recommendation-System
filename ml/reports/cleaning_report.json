@@ -1,0 +1,219 @@
+{
+  "timestamp": "2026-04-29 11:30:00",
+  "input_file": "data/raw/bangalore_properties.csv",
+  "steps": [
+    {
+      "step": "Missing Values Analysis",
+      "missing_columns": {},
+      "total_missing_cells": 0,
+      "strategy": "Median for numeric, Mode for categorical",
+      "rows_before": 20000,
+      "rows_after": 20000,
+      "rows_removed": 0
+    },
+    {
+      "step": "Duplicate Detection",
+      "id_duplicates": 0,
+      "feature_duplicates": 0,
+      "rows_before": 20000,
+      "rows_after": 20000,
+      "rows_removed": 0
+    },
+    {
+      "step": "Outlier Detection (IQR on price_per_sqft)",
+      "method": "IQR 1.5x per location group",
+      "location_details": {
+        "BTM Layout": {
+          "before": 1026,
+          "after": 1009,
+          "outliers_removed": 17,
+          "iqr_lower": 4576.76,
+          "iqr_upper": 19566.76
+        },
+        "Bannerghatta Road": {
+          "before": 1004,
+          "after": 985,
+          "outliers_removed": 19,
+          "iqr_lower": 3609.98,
+          "iqr_upper": 13834.38
+        },
+        "Basavanagudi": {
+          "before": 978,
+          "after": 959,
+          "outliers_removed": 19,
+          "iqr_lower": 5476.57,
+          "iqr_upper": 22348.9
+        },
+        "Devanahalli": {
+          "before": 973,
+          "after": 954,
+          "outliers_removed": 19,
+          "iqr_lower": 2438.92,
+          "iqr_upper": 9929.49
+        },
+        "Electronic City": {
+          "before": 1004,
+          "after": 990,
+          "outliers_removed": 14,
+          "iqr_lower": 3216.02,
+          "iqr_upper": 12435.06
+        },
+        "HSR Layout": {
+          "before": 958,
+          "after": 935,
+          "outliers_removed": 23,
+          "iqr_lower": 4935.18,
+          "iqr_upper": 21953.69
+        },
+        "Hebbal": {
+          "before": 997,
+          "after": 969,
+          "outliers_removed": 28,
+          "iqr_lower": 4855.24,
+          "iqr_upper": 18809.2
+        },
+        "Hennur": {
+          "before": 999,
+          "after": 977,
+          "outliers_removed": 22,
+          "iqr_lower": 3429.98,
+          "iqr_upper": 13189.8
+        },
+        "Indiranagar": {
+          "before": 1027,
+          "after": 993,
+          "outliers_removed": 34,
+          "iqr_lower": 8653.78,
+          "iqr_upper": 34684.22
+        },
+        "JP Nagar": {
+          "before": 1022,
+          "after": 1005,
+          "outliers_removed": 17,
+          "iqr_lower": 4385.5,
+          "iqr_upper": 18145.19
+        },
+        "Jayanagar": {
+          "before": 993,
+          "after": 975,
+          "outliers_removed": 18,
+          "iqr_lower": 7073.32,
+          "iqr_upper": 27373.05
+        },
+        "KR Puram": {
+          "before": 991,
+          "after": 980,
+          "outliers_removed": 11,
+          "iqr_lower": 2328.32,
+          "iqr_upper": 11390.26
+        },
+        "Kanakapura Road": {
+          "before": 1061,
+          "after": 1050,
+          "outliers_removed": 11,
+          "iqr_lower": 2754.74,
+          "iqr_upper": 11869.98
+        },
+        "Koramangala": {
+          "before": 947,
+          "after": 923,
+          "outliers_removed": 24,
+          "iqr_lower": 7196.6,
+          "iqr_upper": 28514.47
+        },
+        "Malleswaram": {
+          "before": 1030,
+          "after": 1012,
+          "outliers_removed": 18,
+          "iqr_lower": 6243.1,
+          "iqr_upper": 25939.65
+        },
+        "Marathahalli": {
+          "before": 1036,
+          "after": 1021,
+          "outliers_removed": 15,
+          "iqr_lower": 4224.42,
+          "iqr_upper": 16162.65
+        },
+        "Rajajinagar": {
+          "before": 995,
+          "after": 964,
+          "outliers_removed": 31,
+          "iqr_lower": 6369.75,
+          "iqr_upper": 23513.33
+        },
+        "Sarjapur Road": {
+          "before": 962,
+          "after": 943,
+          "outliers_removed": 19,
+          "iqr_lower": 3695.4,
+          "iqr_upper": 14683.06
+        },
+        "Whitefield": {
+          "before": 1031,
+          "after": 1018,
+          "outliers_removed": 13,
+          "iqr_lower": 4508.07,
+          "iqr_upper": 16917.31
+        },
+        "Yelahanka": {
+          "before": 966,
+          "after": 954,
+          "outliers_removed": 12,
+          "iqr_lower": 2955.07,
+          "iqr_upper": 11691.12
+        }
+      },
+      "total_outliers_removed": 384,
+      "rows_before": 20000,
+      "rows_after": 19616,
+      "rows_removed": 384
+    },
+    {
+      "step": "Data Validation",
+      "validations": [
+        "Removed 0 rows with price <= 0",
+        "Removed 0 rows with sqft <= 0",
+        "Removed 0 rows with bedrooms < 0",
+        "Removed 333 rows with floor > total_floors"
+      ],
+      "rows_before": 19616,
+      "rows_after": 19283,
+      "rows_removed": 333
+    },
+    {
+      "step": "Leakage Check",
+      "method": "Correlation > 0.95 with target (price)",
+      "flagged_columns": [],
+      "note": "price_per_sqft excluded (known derived feature)",
+      "action": "No leakage columns removed",
+      "rows_before": 19283,
+      "rows_after": 19283,
+      "rows_removed": 0
+    },
+    {
+      "step": "Date Parsing & Final Cleanup",
+      "new_columns": [
+        "listing_year",
+        "listing_month",
+        "price_per_sqft (recalculated)"
+      ],
+      "rows_before": 19283,
+      "rows_after": 19283,
+      "rows_removed": 0
+    }
+  ],
+  "initial_shape": {
+    "rows": 20000,
+    "columns": 30
+  },
+  "final_shape": {
+    "rows": 19283,
+    "columns": 33
+  },
+  "summary": {
+    "total_rows_removed": 717,
+    "retention_rate": 96.41,
+    "columns_added": 3
+  }
+}

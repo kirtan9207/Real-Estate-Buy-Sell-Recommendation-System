@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Executive Report — Bangalore Real Estate Intelligence</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e0e0e0; line-height: 1.6; }
+        .container { max-width: 1100px; margin: auto; padding: 40px 24px; }
+        h1 { font-size: 2.2rem; color: #fff; margin-bottom: 4px; }
+        h2 { font-size: 1.4rem; color: #2563eb; margin: 40px 0 16px; border-bottom: 1px solid #222; padding-bottom: 8px; }
+        h3 { font-size: 1.1rem; color: #a78bfa; margin: 24px 0 8px; }
+        .subtitle { color: #888; margin-bottom: 32px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+        .kpi { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 20px; }
+        .kpi-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-value { font-size: 1.6rem; font-weight: 800; margin-top: 4px; }
+        .kpi-value.green { color: #10b981; }
+        .kpi-value.blue { color: #2563eb; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        th { background: #1a1a1a; color: #888; text-align: left; padding: 12px 16px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 10px 16px; border-bottom: 1px solid #1a1a1a; font-size: 0.9rem; }
+        tr:hover { background: #141414; }
+        .card { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        .tag { display: inline-block; background: rgba(37,99,235,0.1); color: #2563eb; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin: 2px; }
+        .highlight { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 16px; margin: 16px 0; }
+        img { max-width: 100%; border-radius: 10px; border: 1px solid #222; margin: 12px 0; }
+        .plot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .footer { text-align: center; color: #555; font-size: 0.8rem; margin-top: 60px; padding-top: 20px; border-top: 1px solid #222; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>🏗️ Executive Intelligence Report</h1>
+    <p class="subtitle">Bangalore Real Estate Buy/Sell Recommendation System — Generated: April 29, 2026</p>
+
+    <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-label">Total Properties</div><div class="kpi-value">19,283</div></div>
+        <div class="kpi"><div class="kpi-label">Avg Market Price</div><div class="kpi-value blue">₹2.41Cr</div></div>
+        <div class="kpi"><div class="kpi-label">Best ROI Location</div><div class="kpi-value green">Devanahalli</div></div>
+        <div class="kpi"><div class="kpi-label">Model R² Score</div><div class="kpi-value green">0.9797</div></div>
+    </div>
+
+    <h2>1. Project Overview</h2>
+    <div class="card">
+        <p>This system analyzes <strong>19,283</strong> property listings across <strong>20</strong> Bangalore localities. It uses machine learning to predict property prices, detect undervalued investment opportunities, match buyer preferences, and generate buy/sell/hold signals.</p>
+        <h3>Pipeline Flow</h3>
+        <p>Data Generation → Cleaning → Feature Engineering → Baseline Models → Primary Models → Evaluation → Recommendations → Clustering → Dashboard</p>
+    </div>
+
+    <h2>2. Data Cleaning Summary</h2>
+    <div class="card">
+        <p>Initial: <strong>20000</strong> rows → Final: <strong>19283</strong> rows</p>
+        <p>Retention Rate: <strong>96.41%</strong></p>
+    </div>
+
+    <h2>3. Baseline Model Results</h2>
+    <table>
+        <thead><tr><th>Baseline</th><th>RMSE</th><th>MAE</th><th>R²</th></tr></thead>
+        <tbody>
+        <tr>
+            <td>Global Mean</td>
+            <td>₹18,144,282</td>
+            <td>₹12,883,330</td>
+            <td>0.0000</td>
+        </tr>
+        <tr>
+            <td>Global Median</td>
+            <td>₹18,902,599</td>
+            <td>₹12,082,286</td>
+            <td>-0.0853</td>
+        </tr>
+        <tr>
+            <td>Location Mean</td>
+            <td>₹15,934,028</td>
+            <td>₹10,895,026</td>
+            <td>0.2288</td>
+        </tr></tbody>
+    </table>
+
+    <h2>4. Model Comparison</h2>
+    <table>
+        <thead><tr><th>Model</th><th>RMSE</th><th>MAE</th><th>MAPE</th><th>R²</th></tr></thead>
+        <tbody>
+        <tr>
+            <td>Linear Regression</td>
+            <td>₹9,001,251</td>
+            <td>₹6,032,683</td>
+            <td>33.5%</td>
+            <td><strong>0.7643</strong></td>
+        </tr>
+        <tr>
+            <td>Decision Tree</td>
+            <td>₹5,260,429</td>
+            <td>₹3,239,066</td>
+            <td>13.8%</td>
+            <td><strong>0.9195</strong></td>
+        </tr>
+        <tr>
+            <td>Random Forest</td>
+            <td>₹3,573,001</td>
+            <td>₹2,173,075</td>
+            <td>9.1%</td>
+            <td><strong>0.9629</strong></td>
+        </tr>
+        <tr>
+            <td>XGBoost</td>
+            <td>₹2,639,185</td>
+            <td>₹1,570,621</td>
+            <td>6.3%</td>
+            <td><strong>0.9797</strong></td>
+        </tr></tbody>
+    </table>
+    <div class="highlight">
+        <strong>🏆 Best Model:</strong> XGBoost with R² = 0.9797
+    </div>
+
+    <h2>5. Diagnostic Plots</h2>
+    <div class="plot-grid">
+        <div><img src="assets/model_comparison.png" alt="Model Comparison"></div>
+        <div><img src="assets/actual_vs_predicted.png" alt="Actual vs Predicted"></div>
+        <div><img src="assets/residual_distribution.png" alt="Residual Distribution"></div>
+        <div><img src="assets/feature_importance.png" alt="Feature Importance"></div>
+        <div><img src="assets/location_error.png" alt="Location Error"></div>
+        <div><img src="assets/cluster_scatter.png" alt="Market Segments"></div>
+    </div>
+
+    <h2>6. Location Intelligence</h2>
+    <table>
+        <thead><tr><th>Location</th><th>Avg Price</th><th>Avg ROI</th><th>Trend</th><th>Demand</th></tr></thead>
+        <tbody>
+        <tr>
+            <td>Devanahalli</td>
+            <td>₹1.30Cr</td>
+            <td>18.5%</td>
+            <td>🔥 Hot</td>
+            <td>65</td>
+        </tr>
+        <tr>
+            <td>Yelahanka</td>
+            <td>₹1.49Cr</td>
+            <td>16.3%</td>
+            <td>🔥 Hot</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>Kanakapura Road</td>
+            <td>₹1.52Cr</td>
+            <td>15.6%</td>
+            <td>🔥 Hot</td>
+            <td>63</td>
+        </tr>
+        <tr>
+            <td>Electronic City</td>
+            <td>₹1.60Cr</td>
+            <td>15.5%</td>
+            <td>🔥 Hot</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>Sarjapur Road</td>
+            <td>₹1.93Cr</td>
+            <td>14.6%</td>
+            <td>🔥 Hot</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>KR Puram</td>
+            <td>₹1.42Cr</td>
+            <td>14.4%</td>
+            <td>🔥 Hot</td>
+            <td>63</td>
+        </tr>
+        <tr>
+            <td>Hennur</td>
+            <td>₹1.69Cr</td>
+            <td>13.6%</td>
+            <td>🔥 Hot</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>Bannerghatta Road</td>
+            <td>₹1.77Cr</td>
+            <td>13.6%</td>
+            <td>🔥 Hot</td>
+            <td>63</td>
+        </tr>
+        <tr>
+            <td>Whitefield</td>
+            <td>₹2.28Cr</td>
+            <td>12.4%</td>
+            <td>📈 Warm</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>Marathahalli</td>
+            <td>₹2.11Cr</td>
+            <td>11.6%</td>
+            <td>📈 Warm</td>
+            <td>63</td>
+        </tr>
+        <tr>
+            <td>Hebbal</td>
+            <td>₹2.47Cr</td>
+            <td>11.5%</td>
+            <td>📈 Warm</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>HSR Layout</td>
+            <td>₹2.83Cr</td>
+            <td>10.5%</td>
+            <td>📈 Warm</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>BTM Layout</td>
+            <td>₹2.48Cr</td>
+            <td>10.5%</td>
+            <td>📈 Warm</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>JP Nagar</td>
+            <td>₹2.30Cr</td>
+            <td>9.4%</td>
+            <td>📈 Warm</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>Basavanagudi</td>
+            <td>₹2.86Cr</td>
+            <td>8.5%</td>
+            <td>📉 Cool</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>Indiranagar</td>
+            <td>₹4.58Cr</td>
+            <td>8.5%</td>
+            <td>📉 Cool</td>
+            <td>65</td>
+        </tr>
+        <tr>
+            <td>Rajajinagar</td>
+            <td>₹3.07Cr</td>
+            <td>7.5%</td>
+            <td>📉 Cool</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>Koramangala</td>
+            <td>₹3.60Cr</td>
+            <td>7.5%</td>
+            <td>📉 Cool</td>
+            <td>64</td>
+        </tr>
+        <tr>
+            <td>Jayanagar</td>
+            <td>₹3.66Cr</td>
+            <td>6.5%</td>
+            <td>📉 Cool</td>
+            <td>63</td>
+        </tr>
+        <tr>
+            <td>Malleswaram</td>
+            <td>₹3.27Cr</td>
+            <td>6.4%</td>
+            <td>📉 Cool</td>
+            <td>63</td>
+        </tr></tbody>
+    </table>
+
+    <h2>7. Investment Signals</h2>
+    <div class="card">
+        <p><strong>Underpriced Properties Detected:</strong> 356</p>
+        <p><strong>Signal Distribution:</strong> <span class='tag'>BUY: 6928</span> | <span class='tag'>SELL: 5247</span> | <span class='tag'>STRONG BUY: 3527</span> | <span class='tag'>HOLD: 1981</span> | <span class='tag'>STRONG SELL: 1600</span></p>
+    </div>
+
+    <h2>8. Key Recommendations</h2>
+    <div class="card">
+        <h3>🟢 Buy Recommendations</h3>
+        <p>Focus on <strong>Devanahalli</strong> and other emerging locations with ROI > 15%. Target underpriced properties with gap > 10% below predicted value.</p>
+        <h3>🟡 Hold Recommendations</h3>
+        <p>Properties in mid-range locations showing steady 8-12% growth trends. Continue holding for appreciation.</p>
+        <h3>🔴 Sell Considerations</h3>
+        <p>Premium locations with slowing growth (< 7%). Properties where actual price exceeds predicted by > 10% (overpriced).</p>
+    </div>
+
+    <div class="footer">
+        <p>Bangalore Real Estate Buy/Sell Recommendation System — Data Science Project Report</p>
+        <p>Generated on 2026-04-29 11:30:36</p>
+    </div>
+</div>
+</body>
+</html>

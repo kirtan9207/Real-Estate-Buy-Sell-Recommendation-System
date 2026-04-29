@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EDA Report — Bangalore Real Estate</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #0a0a0a; color: #fff; }
+        .container { max-width: 1200px; margin: auto; padding: 40px 20px; }
+        h1 { font-size: 2.5rem; margin-bottom: 8px; }
+        .subtitle { color: #888; margin-bottom: 40px; }
+        .plot { margin-bottom: 48px; }
+        h2 { color: #2563eb; font-size: 1.3rem; margin-bottom: 16px; }
+        img { max-width: 100%; border-radius: 12px; border: 1px solid #222; }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+        .stat-card { background: #141414; padding: 20px; border-radius: 12px; border: 1px solid #222; }
+        .stat-value { font-size: 1.5rem; font-weight: 800; }
+        .stat-label { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Exploratory Data Analysis Report</h1>
+        <p class="subtitle">Bangalore Real Estate Dataset — 19,283 Properties | Generated: 2026-04-29 11:30</p>
+
+        <div class="stats">
+            <div class="stat-card"><div class="stat-label">TOTAL PROPERTIES</div><div class="stat-value">19,283</div></div>
+            <div class="stat-card"><div class="stat-label">LOCATIONS</div><div class="stat-value">20</div></div>
+            <div class="stat-card"><div class="stat-label">AVG PRICE</div><div class="stat-value">₹2.41Cr</div></div>
+            <div class="stat-card"><div class="stat-label">AVG ROI</div><div class="stat-value">11.6%</div></div>
+        </div>
+
+        
+        <div class="plot">
+            <h2>1. Price Distribution</h2>
+            <img src="assets/price_dist.png" alt="Price Distribution">
+        </div>
+        <div class="plot">
+            <h2>2. Price vs Square Footage</h2>
+            <img src="assets/price_vs_sqft.png" alt="Price vs Square Footage">
+        </div>
+        <div class="plot">
+            <h2>3. Correlation Heatmap</h2>
+            <img src="assets/correlation.png" alt="Correlation Heatmap">
+        </div>
+        <div class="plot">
+            <h2>4. Price by Location</h2>
+            <img src="assets/location_box.png" alt="Price by Location">
+        </div>
+        <div class="plot">
+            <h2>5. Bedroom Analysis</h2>
+            <img src="assets/bedroom_analysis.png" alt="Bedroom Analysis">
+        </div>
+        <div class="plot">
+            <h2>6. Age vs Price</h2>
+            <img src="assets/age_vs_price.png" alt="Age vs Price">
+        </div>
+        <div class="plot">
+            <h2>7. Metro Distance vs Price</h2>
+            <img src="assets/distance_vs_price.png" alt="Metro Distance vs Price">
+        </div>
+        <div class="plot">
+            <h2>8. Market Trend by Location</h2>
+            <img src="assets/market_trend.png" alt="Market Trend by Location">
+        </div>
+        <div class="plot">
+            <h2>9. ROI Distribution</h2>
+            <img src="assets/roi_distribution.png" alt="ROI Distribution">
+        </div>
+        <div class="plot">
+            <h2>10. Demand vs Liquidity</h2>
+            <img src="assets/demand_liquidity.png" alt="Demand vs Liquidity">
+        </div>
+    </div>
+</body>
+</html>
