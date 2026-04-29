@@ -28,7 +28,31 @@ st.markdown("""
 <style>
     .main { background-color: #0a0a0a; }
     .stApp { background-color: #0a0a0a; }
-    [data-testid="stSidebar"] { background-color: #0f0f0f; }
+    [data-testid="stSidebar"] { background-color: #0f0f0f; border-right: 1px solid #1a1a1a; }
+    
+    /* Professional Navigation styling */
+    div[role="radiogroup"] > label {
+        padding: 12px 16px;
+        background: #141414;
+        border: 1px solid #222;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    div[role="radiogroup"] > label:hover {
+        background: #1f1f1f;
+        border-color: #333;
+        transform: translateY(-1px);
+    }
+    div[role="radiogroup"] > label[data-checked="true"] {
+        background: #2563eb !important;
+        border-color: #3b82f6 !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    
+    /* Metrics styling */
     .metric-card {
         background: #141414;
         border: 1px solid #222;
@@ -38,11 +62,23 @@ st.markdown("""
     }
     .metric-value { font-size: 1.8rem; font-weight: 800; color: #2563eb; }
     .metric-label { font-size: 0.75rem; color: #888; text-transform: uppercase; }
-    .stMetric { background: #141414; border-radius: 12px; padding: 16px; border: 1px solid #222; }
+    
+    /* Streamlit native metrics */
+    [data-testid="stMetric"] { 
+        background: linear-gradient(145deg, #161616, #121212);
+        border-radius: 12px; 
+        padding: 20px; 
+        border: 1px solid #252525;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    [data-testid="stMetricValue"] { color: #f8fafc; font-weight: 700; }
+    [data-testid="stMetricLabel"] { color: #94a3b8; font-weight: 600; font-size: 0.9rem; }
 </style>
 """, unsafe_allow_html=True)
 
 # --- Data Loading ---
+
+
 @st.cache_data
 def load_data():
     base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -51,6 +87,7 @@ def load_data():
         st.error("Run the pipeline first: python run_pipeline.py")
         st.stop()
     return pd.read_csv(data_path)
+
 
 @st.cache_data
 def load_json_report(name):
@@ -62,6 +99,7 @@ def load_json_report(name):
     except:
         return {}
 
+
 @st.cache_resource
 def load_model(name):
     base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -72,6 +110,7 @@ def load_model(name):
     except:
         return None
 
+
 df = load_data()
 
 # --- Sidebar ---
@@ -80,21 +119,18 @@ st.sidebar.markdown("---")
 
 page = st.sidebar.radio(
     "Navigate",
-    ["Overview", "Price Prediction", "Location Heatmap",
-     "Undervalued Properties", "Model Performance",
-     "Buyer Matching", "ROI Comparison",
-     "Buy/Sell Signal", "Executive Report"],
+    ["Market Overview", "Price Prediction Engine", "Geographic Heatmap",
+     "Undervalued Opportunities", "Buyer Preference Matching",
+     "Investment ROI Analysis", "Algorithmic Trading Signals"],
     label_visibility="collapsed"
 )
 
 st.sidebar.markdown("---")
-st.sidebar.markdown(f"**{len(df):,}** properties loaded")
-st.sidebar.markdown(f"**{df['location'].nunique()}** locations")
 
 # ===================================================================
 # PAGE 1: OVERVIEW
 # ===================================================================
-if page == "Overview":
+if page == "Market Overview":
     st.title("Market Intelligence Dashboard")
     st.markdown("Real-time analytics for Bangalore real estate market")
 
@@ -127,8 +163,8 @@ if page == "Overview":
         if 'segment_label' in df.columns:
             seg_counts = df['segment_label'].value_counts()
             fig = px.pie(values=seg_counts.values, names=seg_counts.index,
-                        title='Market Segmentation', hole=0.4,
-                        color_discrete_sequence=['#6366f1', '#2563eb', '#f59e0b', '#10b981'])
+                         title='Market Segmentation', hole=0.4,
+                         color_discrete_sequence=['#6366f1', '#2563eb', '#f59e0b', '#10b981'])
             fig.update_layout(template='plotly_dark', height=400)
             st.plotly_chart(fig, use_container_width=True)
 
@@ -141,7 +177,7 @@ if page == "Overview":
 # ===================================================================
 # PAGE 2: PRICE PREDICTION
 # ===================================================================
-elif page == "Price Prediction":
+elif page == "Price Prediction Engine":
     st.title("Price Prediction Tool")
 
     model = load_model('price_model.pkl')
@@ -168,9 +204,12 @@ elif page == "Price Prediction":
         st.subheader("Location & Features")
         locations = sorted(df['location'].unique())
         location = st.selectbox("Location", locations)
-        property_type = st.selectbox("Property Type", ['Apartment', 'Villa', 'Penthouse', 'Builder Floor', 'Plot'])
-        furnishing = st.selectbox("Furnishing", ['Unfurnished', 'Semi-furnished', 'Fully-furnished'])
-        listing_type = st.selectbox("Listing Type", ['Resale', 'New Launch', 'Ready to Move'])
+        property_type = st.selectbox(
+            "Property Type", ['Apartment', 'Villa', 'Penthouse', 'Builder Floor', 'Plot'])
+        furnishing = st.selectbox(
+            "Furnishing", ['Unfurnished', 'Semi-furnished', 'Fully-furnished'])
+        listing_type = st.selectbox(
+            "Listing Type", ['Resale', 'New Launch', 'Ready to Move'])
         amenities = st.slider("Amenities Count", 2, 20, 8)
         dist_metro = st.slider("Distance to Metro (km)", 0.1, 15.0, 2.0)
         dist_school = st.slider("Distance to School (km)", 0.2, 8.0, 1.5)
@@ -184,25 +223,32 @@ elif page == "Price Prediction":
         school_sc = 7
         loc_score = connectivity * 0.4 + safety * 0.3 + school_sc * 0.3
         amenity_idx = amenities / 20.0
-        furnish_map = {'Unfurnished': 0, 'Semi-furnished': 1, 'Fully-furnished': 2}
+        furnish_map = {'Unfurnished': 0,
+                       'Semi-furnished': 1, 'Fully-furnished': 2}
         furnish_num = furnish_map[furnishing]
-        luxury = (sqft / 5000) * 0.3 + (amenities / 20) * 0.25 + (furnish_num / 2) * 0.2 + (balconies / 3) * 0.15 + (parking / 2) * 0.1
-        prox = max(0, (15 - (dist_metro * 0.35 + dist_school * 0.2 + dist_hospital * 0.2 + dist_cbd * 0.25)) / 15 * 10)
+        luxury = (sqft / 5000) * 0.3 + (amenities / 20) * 0.25 + \
+            (furnish_num / 2) * 0.2 + (balconies / 3) * 0.15 + (parking / 2) * 0.1
+        prox = max(0, (15 - (dist_metro * 0.35 + dist_school * 0.2 +
+                   dist_hospital * 0.2 + dist_cbd * 0.25)) / 15 * 10)
         age_bucket = 0 if age <= 2 else 1 if age <= 5 else 2 if age <= 10 else 3 if age <= 20 else 4
 
         # Encode categoricals
-        loc_enc = encoders['location'].transform([location])[0] if encoders and 'location' in encoders else 0
+        loc_enc = encoders['location'].transform(
+            [location])[0] if encoders and 'location' in encoders else 0
         builder_enc = 0
-        type_enc = encoders['property_type'].transform([property_type])[0] if encoders and 'property_type' in encoders else 0
-        furnish_enc = encoders['furnishing'].transform([furnishing])[0] if encoders and 'furnishing' in encoders else 0
-        listing_enc = encoders['listing_type'].transform([listing_type])[0] if encoders and 'listing_type' in encoders else 0
+        type_enc = encoders['property_type'].transform(
+            [property_type])[0] if encoders and 'property_type' in encoders else 0
+        furnish_enc = encoders['furnishing'].transform(
+            [furnishing])[0] if encoders and 'furnishing' in encoders else 0
+        listing_enc = encoders['listing_type'].transform(
+            [listing_type])[0] if encoders and 'listing_type' in encoders else 0
 
         features = [sqft, bedrooms, bathrooms, balconies, parking,
-                   age, floor, total_floors, amenities,
-                   dist_metro, dist_school, dist_hospital, dist_cbd,
-                   loc_score, luxury, amenity_idx, prox,
-                   age_bucket, furnish_num,
-                   loc_enc, builder_enc, type_enc, furnish_enc, listing_enc]
+                    age, floor, total_floors, amenities,
+                    dist_metro, dist_school, dist_hospital, dist_cbd,
+                    loc_score, luxury, amenity_idx, prox,
+                    age_bucket, furnish_num,
+                    loc_enc, builder_enc, type_enc, furnish_enc, listing_enc]
 
         predicted_price = int(model.predict([features])[0])
 
@@ -217,19 +263,21 @@ elif page == "Price Prediction":
         # Find similar properties
         loc_data = df[df['location'] == location]
         avg_loc = loc_data['price'].mean()
-        st.info(f"Average price in **{location}**: Rs.{avg_loc:,.0f} | Your prediction: Rs.{predicted_price:,}")
+        st.info(
+            f"Average price in **{location}**: Rs.{avg_loc:,.0f} | Your prediction: Rs.{predicted_price:,}")
 
 # ===================================================================
 # PAGE 3: LOCATION HEATMAP
 # ===================================================================
-elif page == "Location Heatmap":
+elif page == "Geographic Heatmap":
     st.title("Bangalore Market Heatmap")
 
     try:
         import folium
         from streamlit_folium import st_folium
 
-        metric = st.selectbox("Color by", ['roi', 'price', 'demand_score', 'market_trend'])
+        metric = st.selectbox(
+            "Color by", ['roi', 'price', 'demand_score', 'market_trend'])
 
         loc_agg = df.groupby('location').agg(
             lat=('latitude', 'mean'), lon=('longitude', 'mean'),
@@ -243,8 +291,10 @@ elif page == "Location Heatmap":
                        tiles='CartoDB dark_matter')
 
         for _, row in loc_agg.iterrows():
-            val = row['avg_roi'] if metric == 'roi' else row['avg_price'] / 1e7 if metric == 'price' else row['demand'] if metric == 'demand_score' else row['trend'] * 100
-            color = '#10b981' if (metric == 'roi' and val > 12) or (metric == 'market_trend' and val > 12) else '#2563eb' if val > 8 else '#f59e0b'
+            val = row['avg_roi'] if metric == 'roi' else row['avg_price'] / \
+                1e7 if metric == 'price' else row['demand'] if metric == 'demand_score' else row['trend'] * 100
+            color = '#10b981' if (metric == 'roi' and val > 12) or (
+                metric == 'market_trend' and val > 12) else '#2563eb' if val > 8 else '#f59e0b'
 
             folium.CircleMarker(
                 location=[row['lat'], row['lon']],
@@ -256,32 +306,38 @@ elif page == "Location Heatmap":
         st_folium(m, width=None, height=600)
 
     except ImportError:
-        st.warning("Install folium and streamlit-folium: pip install folium streamlit-folium")
+        st.warning(
+            "Install folium and streamlit-folium: pip install folium streamlit-folium")
 
         # Fallback to plotly
-        loc_agg = df.groupby('location').agg(lat=('latitude', 'mean'), lon=('longitude', 'mean'), avg_roi=('roi', 'mean')).reset_index()
+        loc_agg = df.groupby('location').agg(lat=('latitude', 'mean'), lon=(
+            'longitude', 'mean'), avg_roi=('roi', 'mean')).reset_index()
         fig = px.scatter_mapbox(loc_agg, lat='lat', lon='lon', size='avg_roi', color='avg_roi',
-                               hover_name='location', zoom=10, mapbox_style='carto-darkmatter')
+                                hover_name='location', zoom=10, mapbox_style='carto-darkmatter')
         fig.update_layout(height=600)
         st.plotly_chart(fig, use_container_width=True)
 
 # ===================================================================
 # PAGE 4: UNDERVALUED PROPERTIES
 # ===================================================================
-elif page == "Undervalued Properties":
+elif page == "Undervalued Opportunities":
     st.title("Undervalued Property Deals")
 
     if 'valuation_label' in df.columns:
-        underpriced = df[df['valuation_label'] == 'Underpriced'].sort_values('price_gap_pct')
+        underpriced = df[df['valuation_label'] ==
+                         'Underpriced'].sort_values('price_gap_pct')
 
         c1, c2, c3 = st.columns(3)
         c1.metric("Underpriced", f"{len(underpriced):,}")
-        c2.metric("Avg Price Gap", f"{underpriced['price_gap_pct'].mean():.1f}%")
-        c3.metric("Best Deal Gap", f"{underpriced['price_gap_pct'].min():.1f}%")
+        c2.metric("Avg Price Gap",
+                  f"{underpriced['price_gap_pct'].mean():.1f}%")
+        c3.metric("Best Deal Gap",
+                  f"{underpriced['price_gap_pct'].min():.1f}%")
 
         # Filters
         col1, col2 = st.columns(2)
-        loc_filter = col1.multiselect("Filter by Location", df['location'].unique())
+        loc_filter = col1.multiselect(
+            "Filter by Location", df['location'].unique())
         budget = col2.slider("Max Budget (Rs. Cr)", 0.5, 10.0, 5.0)
 
         filtered = underpriced.copy()
@@ -314,7 +370,8 @@ elif page == "Model Performance":
         bl_data = []
         for name in ['global_mean', 'global_median', 'location_mean']:
             b = baseline.get(name, {})
-            bl_data.append({'Model': name.replace('_', ' ').title(), 'RMSE': b.get('rmse', 0), 'MAE': b.get('mae', 0), 'R2': b.get('r2', 0)})
+            bl_data.append({'Model': name.replace('_', ' ').title(), 'RMSE': b.get(
+                'rmse', 0), 'MAE': b.get('mae', 0), 'R2': b.get('r2', 0)})
         st.dataframe(pd.DataFrame(bl_data), use_container_width=True)
 
     # Model metrics
@@ -343,12 +400,13 @@ elif page == "Model Performance":
     for i, plot in enumerate(plots):
         path = os.path.join(assets, plot)
         if os.path.exists(path):
-            cols[i % 2].image(path, caption=plot.replace('_', ' ').replace('.png', '').title())
+            cols[i % 2].image(path, caption=plot.replace(
+                '_', ' ').replace('.png', '').title())
 
 # ===================================================================
 # PAGE 6: BUYER MATCHING
 # ===================================================================
-elif page == "Buyer Matching":
+elif page == "Buyer Preference Matching":
     st.title("Buyer Preference Matching")
 
     col1, col2 = st.columns(2)
@@ -357,7 +415,8 @@ elif page == "Buyer Matching":
         bedrooms = st.selectbox("Preferred Bedrooms", [1, 2, 3, 4, 5], index=1)
         min_sqft = st.slider("Minimum Sqft", 500, 4000, 1000)
     with col2:
-        pref_location = st.selectbox("Preferred Location", ['Any'] + sorted(df['location'].unique().tolist()))
+        pref_location = st.selectbox("Preferred Location", [
+                                     'Any'] + sorted(df['location'].unique().tolist()))
         min_amenities = st.slider("Min Amenities", 2, 20, 5)
 
     if st.button("Find Matching Properties", type="primary", use_container_width=True):
@@ -402,7 +461,7 @@ elif page == "Buyer Matching":
 # ===================================================================
 # PAGE 7: ROI COMPARISON
 # ===================================================================
-elif page == "ROI Comparison":
+elif page == "Investment ROI Analysis":
     st.title("ROI & Market Trend Analysis")
 
     loc_roi = df.groupby('location').agg(
@@ -435,7 +494,7 @@ elif page == "ROI Comparison":
 # ===================================================================
 # PAGE 8: BUY/SELL SIGNAL
 # ===================================================================
-elif page == "Buy/Sell Signal":
+elif page == "Algorithmic Trading Signals":
     st.title("Buy/Sell Recommendation Signal")
 
     if 'sell_signal' in df.columns:
@@ -486,7 +545,8 @@ elif page == "Executive Report":
         st.components.v1.html(html, height=2000, scrolling=True)
 
         with open(report_path, 'rb') as f:
-            st.download_button("Download Report", f.read(), "executive_report.html", "text/html")
+            st.download_button("Download Report", f.read(),
+                               "executive_report.html", "text/html")
     else:
         st.warning("Executive report not generated yet. Run the full pipeline.")
 
