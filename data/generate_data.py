@@ -232,7 +232,7 @@ def generate_production_data(num_records=20000, seed=42):
 
     print(f" Generated {num_records} Bangalore property records")
     print(f" Locations: {df['location'].nunique()}")
-    print(f" Price range: ₹{df['price'].min():,.0f} — ₹{df['price'].max():,.0f}")
+    print(f" Price range: Rs.{df['price'].min():,.0f} — Rs.{df['price'].max():,.0f}")
     print(f" Saved to: {output_path}")
     return df
 

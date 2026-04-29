@@ -18,7 +18,8 @@ app.add_middleware(
 )
 
 # ─── File paths (CSV-based, no DB required) ──────────────
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
 DATA_PATH = os.path.join(BASE_DIR, "data/processed/production_final.csv")
 MODEL_DIR = os.path.join(BASE_DIR, "ml/models")
 
@@ -27,13 +28,15 @@ def load_data():
     """Load production data (CSV fallback — no database needed)."""
     if os.path.exists(DATA_PATH):
         return pd.read_csv(DATA_PATH)
-    raise HTTPException(status_code=500, detail="Data not found. Run python run_pipeline.py first.")
+    raise HTTPException(
+        status_code=500, detail="Data not found. Run python run_pipeline.py first.")
 
 
 def get_model(name: str):
     path = os.path.join(MODEL_DIR, f"{name}.pkl")
     if not os.path.exists(path):
-        raise HTTPException(status_code=500, detail=f"Model {name} not found. Run pipeline first.")
+        raise HTTPException(
+            status_code=500, detail=f"Model {name} not found. Run pipeline first.")
     with open(path, 'rb') as f:
         return pickle.load(f)
 
@@ -69,21 +72,27 @@ def predict_price(req: ValuationInput):
     encoders = get_model("encoders")
 
     # Compute derived features
-    connectivity = max(1.0, 10.0 - (req.distance_metro * 0.4 + req.distance_cbd * 0.15))
+    connectivity = max(1.0, 10.0 - (req.distance_metro *
+                       0.4 + req.distance_cbd * 0.15))
     loc_score = connectivity * 0.4 + 7 * 0.3 + 7 * 0.3
     amenity_idx = req.amenities / 20.0
     furnish_map = {'Unfurnished': 0, 'Semi-furnished': 1, 'Fully-furnished': 2}
     furnish_num = furnish_map.get(req.furnishing, 1)
     luxury = ((req.sqft / 5000) * 0.3 + (req.amenities / 20) * 0.25 +
               (furnish_num / 2) * 0.2 + (req.balconies / 3) * 0.15 + (req.parking / 2) * 0.1)
-    dist_comp = req.distance_metro * 0.35 + req.distance_school * 0.2 + req.distance_hospital * 0.2 + req.distance_cbd * 0.25
+    dist_comp = req.distance_metro * 0.35 + req.distance_school * \
+        0.2 + req.distance_hospital * 0.2 + req.distance_cbd * 0.25
     prox = max(0, (15 - dist_comp) / 15 * 10)
     age_bucket = 0 if req.age <= 2 else 1 if req.age <= 5 else 2 if req.age <= 10 else 3 if req.age <= 20 else 4
 
-    loc_enc = encoders['location'].transform([req.location])[0] if req.location in encoders['location'].classes_ else 0
-    type_enc = encoders['property_type'].transform([req.property_type])[0] if req.property_type in encoders['property_type'].classes_ else 0
-    furnish_enc = encoders['furnishing'].transform([req.furnishing])[0] if req.furnishing in encoders['furnishing'].classes_ else 0
-    listing_enc = encoders['listing_type'].transform([req.listing_type])[0] if req.listing_type in encoders['listing_type'].classes_ else 0
+    loc_enc = encoders['location'].transform(
+        [req.location])[0] if req.location in encoders['location'].classes_ else 0
+    type_enc = encoders['property_type'].transform([req.property_type])[
+        0] if req.property_type in encoders['property_type'].classes_ else 0
+    furnish_enc = encoders['furnishing'].transform(
+        [req.furnishing])[0] if req.furnishing in encoders['furnishing'].classes_ else 0
+    listing_enc = encoders['listing_type'].transform([req.listing_type])[
+        0] if req.listing_type in encoders['listing_type'].classes_ else 0
 
     features = [
         req.sqft, req.bedrooms, req.bathrooms, req.balconies, req.parking,
@@ -107,7 +116,8 @@ def predict_price(req: ValuationInput):
     try:
         signal_model = get_model("signal_model")
         signal_idx = int(signal_model.predict([features])[0])
-        labels = ["BUY (Growth)", "HOLD (Steady)", "SELL (Peak)", "WAIT (Correction)"]
+        labels = ["BUY (Growth)", "HOLD (Steady)",
+                  "SELL (Peak)", "WAIT (Correction)"]
         signal = labels[signal_idx]
     except:
         signal = "HOLD"
@@ -159,7 +169,8 @@ def location_intel():
 def undervalued_assets():
     df = load_data()
     if 'valuation_label' in df.columns:
-        uv = df[df['valuation_label'] == 'Underpriced'].sort_values('price_gap_pct').head(20)
+        uv = df[df['valuation_label'] == 'Underpriced'].sort_values(
+            'price_gap_pct').head(20)
         return uv.to_dict('records')
     return df.nlargest(20, 'roi').to_dict('records')
 

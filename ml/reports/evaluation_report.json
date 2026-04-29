@@ -19,39 +19,39 @@
       "r2": 0.9629
     },
     "XGBoost": {
-      "rmse": 2639185.21,
-      "mae": 1570621.23,
-      "mape": 6.31,
-      "r2": 0.9797
+      "rmse": 2602171.83,
+      "mae": 1569063.34,
+      "mape": 6.35,
+      "r2": 0.9803
     }
   },
   "best_model": "XGBoost",
-  "best_r2": 0.9797,
+  "best_r2": 0.9803,
   "high_error_analysis": {
     "count": 193,
-    "threshold": 5035017.0,
+    "threshold": 5075373.0,
     "by_location": {
-      "Indiranagar": 31,
-      "HSR Layout": 22,
-      "Koramangala": 21,
-      "Jayanagar": 15,
-      "Malleswaram": 15,
-      "Whitefield": 10,
+      "Indiranagar": 36,
+      "HSR Layout": 23,
+      "Koramangala": 20,
+      "Malleswaram": 17,
+      "Jayanagar": 14,
+      "Basavanagudi": 11,
+      "JP Nagar": 11,
       "Hebbal": 10,
-      "Rajajinagar": 10,
-      "Basavanagudi": 10,
-      "BTM Layout": 9
+      "Rajajinagar": 7,
+      "BTM Layout": 7
     },
     "by_property_type": {
       "Villa": 100,
-      "Penthouse": 52,
-      "Apartment": 30,
-      "Builder Floor": 10,
-      "Plot": 1
+      "Penthouse": 49,
+      "Apartment": 33,
+      "Builder Floor": 9,
+      "Plot": 2
     }
   },
   "residual_stats": {
-    "mean": 152735.36,
-    "std": 2634761.94
+    "mean": 124857.57,
+    "std": 2599174.64
   }
 }

@@ -13,89 +13,91 @@ from datetime import datetime
 
 
 def generate_executive_report(
- data_path='data/processed/production_final.csv',
- eval_path='ml/reports/evaluation_report.json',
- baseline_path='ml/reports/baseline_results.json',
- cleaning_path='ml/reports/cleaning_report.json',
- cluster_path='ml/reports/clustering_report.json',
- rec_path='ml/reports/recommendation_report.json',
- output_path='ml/reports/executive_report.html',
- assets_dir='ml/reports/assets'
+    data_path='data/processed/production_final.csv',
+    eval_path='ml/reports/evaluation_report.json',
+    baseline_path='ml/reports/baseline_results.json',
+    cleaning_path='ml/reports/cleaning_report.json',
+    cluster_path='ml/reports/clustering_report.json',
+    rec_path='ml/reports/recommendation_report.json',
+    output_path='ml/reports/executive_report.html',
+    assets_dir='ml/reports/assets'
 ):
- df = pd.read_csv(data_path)
+    df = pd.read_csv(data_path)
 
- # Load reports
- def load_json(path):
- try:
- with open(path) as f:
- return json.load(f)
- except:
- return {}
+    # Load reports
+    def load_json(path):
+        try:
+            with open(path) as f:
+                return json.load(f)
+        except:
+            return {}
 
- eval_report = load_json(eval_path)
- baseline = load_json(baseline_path)
- cleaning = load_json(cleaning_path)
- cluster_report = load_json(cluster_path)
- rec_report = load_json(rec_path)
+    eval_report = load_json(eval_path)
+    baseline = load_json(baseline_path)
+    cleaning = load_json(cleaning_path)
+    cluster_report = load_json(cluster_path)
+    rec_report = load_json(rec_path)
 
- # Compute KPIs
- total_props = len(df)
- avg_price = df['price'].mean()
- locations = df['location'].nunique()
- best_roi_loc = df.groupby('location')['roi'].mean().idxmax()
- best_roi_val = df.groupby('location')['roi'].mean().max()
+    # Compute KPIs
+    total_props = len(df)
+    avg_price = df['price'].mean()
+    locations = df['location'].nunique()
+    best_roi_loc = df.groupby('location')['roi'].mean().idxmax()
+    best_roi_val = df.groupby('location')['roi'].mean().max()
 
- underpriced_count = len(df[df.get('valuation_label', pd.Series()) == 'Underpriced']) if 'valuation_label' in df.columns else 0
- best_model = eval_report.get('best_model', 'XGBoost')
- best_r2 = eval_report.get('best_r2', 'N/A')
+    underpriced_count = len(df[df.get('valuation_label', pd.Series(
+    )) == 'Underpriced']) if 'valuation_label' in df.columns else 0
+    best_model = eval_report.get('best_model', 'XGBoost')
+    best_r2 = eval_report.get('best_r2', 'N/A')
 
- # Model metrics table
- metrics = eval_report.get('model_metrics', {})
- metrics_rows = ''
- for model, m in metrics.items():
- metrics_rows += f"""
+    # Model metrics table
+    metrics = eval_report.get('model_metrics', {})
+    metrics_rows = ''
+    for model, m in metrics.items():
+        metrics_rows += f"""
  <tr>
  <td>{model}</td>
- <td>₹{m.get('rmse', 0):,.0f}</td>
- <td>₹{m.get('mae', 0):,.0f}</td>
+ <td>Rs.{m.get('rmse', 0):,.0f}</td>
+ <td>Rs.{m.get('mae', 0):,.0f}</td>
  <td>{m.get('mape', 0):.1f}%</td>
  <td><strong>{m.get('r2', 0):.4f}</strong></td>
  </tr>"""
 
- # Baseline metrics
- baseline_rows = ''
- for bname in ['global_mean', 'global_median', 'location_mean']:
- b = baseline.get(bname, {})
- baseline_rows += f"""
+    # Baseline metrics
+    baseline_rows = ''
+    for bname in ['global_mean', 'global_median', 'location_mean']:
+        b = baseline.get(bname, {})
+    baseline_rows += f"""
  <tr>
  <td>{bname.replace('_', ' ').title()}</td>
- <td>₹{b.get('rmse', 0):,.0f}</td>
- <td>₹{b.get('mae', 0):,.0f}</td>
+ <td>Rs.{b.get('rmse', 0):,.0f}</td>
+ <td>Rs.{b.get('mae', 0):,.0f}</td>
  <td>{b.get('r2', 0):.4f}</td>
  </tr>"""
 
- # Location summary
- loc_summary = df.groupby('location').agg({
- 'price': 'mean', 'roi': 'mean', 'market_trend': 'mean', 'demand_score': 'mean'
- }).round(2).sort_values('roi', ascending=False)
+    # Location summary
+    loc_summary = df.groupby('location').agg({
+        'price': 'mean', 'roi': 'mean', 'market_trend': 'mean', 'demand_score': 'mean'
+    }).round(2).sort_values('roi', ascending=False)
 
- loc_rows = ''
- for loc, row in loc_summary.iterrows():
- trend_label = ' Hot' if row['market_trend'] > 0.12 else ' Warm' if row['market_trend'] > 0.08 else ' Cool'
- loc_rows += f"""
+    loc_rows = ''
+    for loc, row in loc_summary.iterrows():
+        trend_label = ' Hot' if row['market_trend'] > 0.12 else ' Warm' if row['market_trend'] > 0.08 else ' Cool'
+    loc_rows += f"""
  <tr>
  <td>{loc}</td>
- <td>₹{row['price']/1e7:.2f}Cr</td>
+ <td>Rs.{row['price']/1e7:.2f}Cr</td>
  <td>{row['roi']:.1f}%</td>
  <td>{trend_label}</td>
  <td>{row['demand_score']:.0f}</td>
  </tr>"""
 
- # Signal distribution
- signal_dist = rec_report.get('sell_signal_distribution', {})
- signal_html = ' | '.join([f"<span class='tag'>{k}: {v}</span>" for k, v in signal_dist.items()])
+    # Signal distribution
+    signal_dist = rec_report.get('sell_signal_distribution', {})
+    signal_html = ' | '.join(
+        [f"<span class='tag'>{k}: {v}</span>" for k, v in signal_dist.items()])
 
- html = f"""<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html>
 <head>
  <title>Executive Report — Bangalore Real Estate Intelligence</title>
@@ -133,7 +135,7 @@ def generate_executive_report(
 
  <div class="kpi-grid">
  <div class="kpi"><div class="kpi-label">Total Properties</div><div class="kpi-value">{total_props:,}</div></div>
- <div class="kpi"><div class="kpi-label">Avg Market Price</div><div class="kpi-value blue">₹{avg_price/1e7:.2f}Cr</div></div>
+ <div class="kpi"><div class="kpi-label">Avg Market Price</div><div class="kpi-value blue">Rs.{avg_price/1e7:.2f}Cr</div></div>
  <div class="kpi"><div class="kpi-label">Best ROI Location</div><div class="kpi-value green">{best_roi_loc}</div></div>
  <div class="kpi"><div class="kpi-label">Model R² Score</div><div class="kpi-value green">{best_r2}</div></div>
  </div>
@@ -206,13 +208,13 @@ def generate_executive_report(
 </body>
 </html>"""
 
- os.makedirs(os.path.dirname(output_path), exist_ok=True)
- with open(output_path, 'w') as f:
- f.write(html)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, 'w') as f:
+        f.write(html)
 
- print(f"\n Executive Report generated: {output_path}")
- return output_path
+    print(f"\n Executive Report generated: {output_path}")
+    return output_path
 
 
 if __name__ == '__main__':
- generate_executive_report()
+    generate_executive_report()

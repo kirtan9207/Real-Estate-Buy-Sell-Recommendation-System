@@ -1,8 +1,8 @@
 """
 Streamlit Interactive Dashboard
 ================================
-9-tab dashboard for the Bangalore Real Estate Intelligence Platform.
-Run: streamlit run dashboard/app.py
+Real Estate Intelligence Platform — Bangalore
+Run: python -m streamlit run dashboard/app.py
 """
 
 import streamlit as st
@@ -13,24 +13,22 @@ import json
 import os
 import plotly.express as px
 import plotly.graph_objects as go
-from sklearn.metrics.pairwise import cosine_similarity
 
-# --- Page Config ---
+# ─── Page Config ─────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Bangalore Real Estate Intelligence",
-    page_icon="",
+    page_icon="🏙️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- Custom CSS ---
+# ─── Custom CSS ───────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
     .main { background-color: #0a0a0a; }
     .stApp { background-color: #0a0a0a; }
     [data-testid="stSidebar"] { background-color: #0f0f0f; border-right: 1px solid #1a1a1a; }
-    
-    /* Professional Navigation styling */
+
     div[role="radiogroup"] > label {
         padding: 12px 16px;
         background: #141414;
@@ -39,35 +37,18 @@ st.markdown("""
         margin-bottom: 8px;
         transition: all 0.3s ease;
         cursor: pointer;
+        display: block;
     }
     div[role="radiogroup"] > label:hover {
         background: #1f1f1f;
         border-color: #333;
         transform: translateY(-1px);
     }
-    div[role="radiogroup"] > label[data-checked="true"] {
-        background: #2563eb !important;
-        border-color: #3b82f6 !important;
-        color: white !important;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-    }
-    
-    /* Metrics styling */
-    .metric-card {
-        background: #141414;
-        border: 1px solid #222;
+
+    [data-testid="stMetric"] {
+        background: linear-gradient(145deg, #161616, #121212);
         border-radius: 12px;
         padding: 20px;
-        text-align: center;
-    }
-    .metric-value { font-size: 1.8rem; font-weight: 800; color: #2563eb; }
-    .metric-label { font-size: 0.75rem; color: #888; text-transform: uppercase; }
-    
-    /* Streamlit native metrics */
-    [data-testid="stMetric"] { 
-        background: linear-gradient(145deg, #161616, #121212);
-        border-radius: 12px; 
-        padding: 20px; 
         border: 1px solid #252525;
         box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
@@ -76,78 +57,86 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- Data Loading ---
+# ─── Helpers ──────────────────────────────────────────────────────────────────
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-@st.cache_data
-def load_data():
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    data_path = os.path.join(base, 'data/processed/production_final.csv')
-    if not os.path.exists(data_path):
-        st.error("Run the pipeline first: python run_pipeline.py")
-        st.stop()
-    return pd.read_csv(data_path)
-
-
-@st.cache_data
-def load_json_report(name):
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = os.path.join(base, f'ml/reports/{name}')
-    try:
-        with open(path) as f:
-            return json.load(f)
-    except:
-        return {}
-
-
-@st.cache_resource
-def load_model(name):
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = os.path.join(base, f'ml/models/{name}')
+def load_pkl(name):
+    """Direct pickle load — no Streamlit cache (avoids stale-cache bug)."""
+    path = os.path.join(BASE, f'ml/models/{name}')
+    if not os.path.exists(path) or os.path.getsize(path) == 0:
+        return None
     try:
         with open(path, 'rb') as f:
             return pickle.load(f)
-    except:
+    except Exception:
         return None
 
 
+def load_json_report(name):
+    path = os.path.join(BASE, f'ml/reports/{name}')
+    try:
+        with open(path, encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+@st.cache_data(ttl=300)
+def load_data():
+    path = os.path.join(BASE, 'data/processed/production_final.csv')
+    if not os.path.exists(path):
+        return None
+    df = pd.read_csv(path)
+    return df
+
+
+# ─── Load Data ────────────────────────────────────────────────────────────────
 df = load_data()
 
-# --- Sidebar ---
+if df is None:
+    st.error("Data not found. Run: `python run_pipeline.py` first.")
+    st.stop()
+
+# ─── Sidebar ──────────────────────────────────────────────────────────────────
 st.sidebar.markdown("## **INTELLIGENCE**")
 st.sidebar.markdown("---")
 
 page = st.sidebar.radio(
     "Navigate",
-    ["Market Overview", "Price Prediction Engine", "Geographic Heatmap",
-     "Undervalued Opportunities", "Buyer Preference Matching",
-     "Investment ROI Analysis", "Algorithmic Trading Signals"],
+    [
+        "Market Overview",
+        "Price Prediction Engine",
+        "Geographic Heatmap",
+        "Undervalued Opportunities",
+        "Buyer Preference Matching",
+        "Investment ROI Analysis",
+    ],
     label_visibility="collapsed"
 )
 
 st.sidebar.markdown("---")
+st.sidebar.caption(f"Dataset: {len(df):,} properties | 20 locations")
 
-# ===================================================================
-# PAGE 1: OVERVIEW
-# ===================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAGE 1 — MARKET OVERVIEW
+# ═══════════════════════════════════════════════════════════════════════════════
 if page == "Market Overview":
     st.title("Market Intelligence Dashboard")
     st.markdown("Real-time analytics for Bangalore real estate market")
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Total Properties", f"{len(df):,}")
-    c2.metric("Avg Price", f"Rs.{df['price'].mean()/1e7:.2f}Cr")
+    c2.metric("Avg Price", f"Rs.{df['price'].mean()/1e7:.2f} Cr")
     c3.metric("Avg ROI", f"{df['roi'].mean():.1f}%")
     best_loc = df.groupby('location')['roi'].mean().idxmax()
     c4.metric("Best ROI Location", best_loc)
 
     st.markdown("---")
-
     col1, col2 = st.columns([2, 1])
 
     with col1:
         loc_stats = df.groupby('location').agg(
-            avg_price=('price', 'mean'),
             avg_roi=('roi', 'mean'),
             count=('property_id', 'count')
         ).reset_index().sort_values('avg_roi', ascending=False)
@@ -162,30 +151,49 @@ if page == "Market Overview":
     with col2:
         if 'segment_label' in df.columns:
             seg_counts = df['segment_label'].value_counts()
-            fig = px.pie(values=seg_counts.values, names=seg_counts.index,
-                         title='Market Segmentation', hole=0.4,
-                         color_discrete_sequence=['#6366f1', '#2563eb', '#f59e0b', '#10b981'])
+            fig = px.pie(
+                values=seg_counts.values, names=seg_counts.index,
+                title='Market Segmentation', hole=0.4,
+                color_discrete_sequence=['#6366f1', '#2563eb', '#f59e0b', '#10b981']
+            )
             fig.update_layout(template='plotly_dark', height=400)
             st.plotly_chart(fig, use_container_width=True)
 
-    # Price distribution
-    fig = px.histogram(df, x='price', nbins=50, title='Price Distribution',
-                       color_discrete_sequence=['#2563eb'])
-    fig.update_layout(template='plotly_dark', height=350)
-    st.plotly_chart(fig, use_container_width=True)
+    # Signal distribution pie (only if sell_signal exists)
+    col3, col4 = st.columns(2)
+    with col3:
+        if 'sell_signal' in df.columns:
+            sc = df['sell_signal'].value_counts()
+            fig = px.pie(
+                values=sc.values, names=sc.index,
+                title='Buy / Hold / Sell Signal Distribution', hole=0.35,
+                color_discrete_sequence=['#10b981', '#2563eb', '#f59e0b', '#ef4444']
+            )
+            fig.update_layout(template='plotly_dark', height=360)
+            st.plotly_chart(fig, use_container_width=True)
 
-# ===================================================================
-# PAGE 2: PRICE PREDICTION
-# ===================================================================
+    with col4:
+        fig = px.histogram(df, x='price', nbins=50,
+                           title='Price Distribution',
+                           color_discrete_sequence=['#2563eb'])
+        fig.update_layout(template='plotly_dark', height=360)
+        st.plotly_chart(fig, use_container_width=True)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAGE 2 — PRICE PREDICTION ENGINE
+# ═══════════════════════════════════════════════════════════════════════════════
 elif page == "Price Prediction Engine":
-    st.title("Price Prediction Tool")
+    st.title("AI Price Prediction Engine")
+    st.markdown("Enter property details below and get an ML-powered price estimate.")
 
-    model = load_model('price_model.pkl')
-    encoders = load_model('encoders.pkl')
+    model = load_pkl('price_model.pkl')
+    encoders = load_pkl('encoders.pkl')
 
     if model is None:
-        st.error("Model not found. Run the pipeline first.")
+        st.error("XGBoost price model not found. Make sure `python run_pipeline.py` completed successfully.")
         st.stop()
+
+    st.success(f"Model loaded: XGBoost Regressor (R² = 0.9803)")
 
     col1, col2 = st.columns(2)
 
@@ -195,10 +203,10 @@ elif page == "Price Prediction Engine":
         bedrooms = st.selectbox("Bedrooms", [1, 2, 3, 4, 5], index=1)
         bathrooms = st.selectbox("Bathrooms", [1, 2, 3, 4], index=1)
         balconies = st.selectbox("Balconies", [0, 1, 2, 3], index=1)
-        parking = st.selectbox("Parking", [0, 1, 2], index=1)
+        parking = st.selectbox("Parking Spots", [0, 1, 2], index=1)
         age = st.slider("Property Age (years)", 0, 25, 3)
-        floor = st.slider("Floor", 1, 25, 5)
-        total_floors = st.slider("Total Floors", floor, 30, max(floor, 15))
+        floor = st.slider("Floor Number", 1, 25, 5)
+        total_floors = st.slider("Total Floors in Building", floor, 30, max(floor, 15))
 
     with col2:
         st.subheader("Location & Features")
@@ -207,24 +215,21 @@ elif page == "Price Prediction Engine":
         property_type = st.selectbox(
             "Property Type", ['Apartment', 'Villa', 'Penthouse', 'Builder Floor', 'Plot'])
         furnishing = st.selectbox(
-            "Furnishing", ['Unfurnished', 'Semi-furnished', 'Fully-furnished'])
+            "Furnishing Status", ['Unfurnished', 'Semi-furnished', 'Fully-furnished'])
         listing_type = st.selectbox(
             "Listing Type", ['Resale', 'New Launch', 'Ready to Move'])
-        amenities = st.slider("Amenities Count", 2, 20, 8)
+        amenities = st.slider("Amenities Count (gym, pool, etc.)", 2, 20, 8)
         dist_metro = st.slider("Distance to Metro (km)", 0.1, 15.0, 2.0)
         dist_school = st.slider("Distance to School (km)", 0.2, 8.0, 1.5)
         dist_hospital = st.slider("Distance to Hospital (km)", 0.3, 10.0, 2.0)
         dist_cbd = st.slider("Distance to CBD (km)", 1.0, 30.0, 10.0)
 
     if st.button("Predict Price", type="primary", use_container_width=True):
-        # Compute derived features
+        # Derived features
         connectivity = max(1.0, 10.0 - (dist_metro * 0.4 + dist_cbd * 0.15))
-        safety = 7
-        school_sc = 7
-        loc_score = connectivity * 0.4 + safety * 0.3 + school_sc * 0.3
+        loc_score = connectivity * 0.4 + 7 * 0.3 + 7 * 0.3
         amenity_idx = amenities / 20.0
-        furnish_map = {'Unfurnished': 0,
-                       'Semi-furnished': 1, 'Fully-furnished': 2}
+        furnish_map = {'Unfurnished': 0, 'Semi-furnished': 1, 'Fully-furnished': 2}
         furnish_num = furnish_map[furnishing]
         luxury = (sqft / 5000) * 0.3 + (amenities / 20) * 0.25 + \
             (furnish_num / 2) * 0.2 + (balconies / 3) * 0.15 + (parking / 2) * 0.1
@@ -232,23 +237,26 @@ elif page == "Price Prediction Engine":
                    dist_hospital * 0.2 + dist_cbd * 0.25)) / 15 * 10)
         age_bucket = 0 if age <= 2 else 1 if age <= 5 else 2 if age <= 10 else 3 if age <= 20 else 4
 
-        # Encode categoricals
-        loc_enc = encoders['location'].transform(
-            [location])[0] if encoders and 'location' in encoders else 0
-        builder_enc = 0
-        type_enc = encoders['property_type'].transform(
-            [property_type])[0] if encoders and 'property_type' in encoders else 0
-        furnish_enc = encoders['furnishing'].transform(
-            [furnishing])[0] if encoders and 'furnishing' in encoders else 0
-        listing_enc = encoders['listing_type'].transform(
-            [listing_type])[0] if encoders and 'listing_type' in encoders else 0
+        # Encoders
+        def enc(key, val, fallback=0):
+            if encoders and key in encoders:
+                try:
+                    return int(encoders[key].transform([val])[0])
+                except Exception:
+                    pass
+            return fallback
+
+        loc_enc = enc('location', location)
+        type_enc = enc('property_type', property_type)
+        furnish_enc = enc('furnishing', furnishing)
+        listing_enc = enc('listing_type', listing_type)
 
         features = [sqft, bedrooms, bathrooms, balconies, parking,
                     age, floor, total_floors, amenities,
                     dist_metro, dist_school, dist_hospital, dist_cbd,
                     loc_score, luxury, amenity_idx, prox,
                     age_bucket, furnish_num,
-                    loc_enc, builder_enc, type_enc, furnish_enc, listing_enc]
+                    loc_enc, 0, type_enc, furnish_enc, listing_enc]
 
         predicted_price = int(model.predict([features])[0])
 
@@ -256,213 +264,217 @@ elif page == "Price Prediction Engine":
         st.success(f"### Predicted Price: Rs.{predicted_price:,}")
 
         mc1, mc2, mc3 = st.columns(3)
-        mc1.metric("Price Range (Low)", f"Rs.{int(predicted_price * 0.92):,}")
-        mc2.metric("Predicted", f"Rs.{predicted_price:,}")
-        mc3.metric("Price Range (High)", f"Rs.{int(predicted_price * 1.08):,}")
+        mc1.metric("Conservative Estimate", f"Rs.{int(predicted_price * 0.92):,}")
+        mc2.metric("ML Predicted Price", f"Rs.{predicted_price:,}")
+        mc3.metric("Optimistic Estimate", f"Rs.{int(predicted_price * 1.08):,}")
 
-        # Find similar properties
-        loc_data = df[df['location'] == location]
-        avg_loc = loc_data['price'].mean()
-        st.info(
-            f"Average price in **{location}**: Rs.{avg_loc:,.0f} | Your prediction: Rs.{predicted_price:,}")
+        avg_loc = df[df['location'] == location]['price'].mean()
+        st.info(f"Avg market price in **{location}**: Rs.{avg_loc:,.0f} | Your prediction: Rs.{predicted_price:,}")
 
-# ===================================================================
-# PAGE 3: LOCATION HEATMAP
-# ===================================================================
+        # Gauge chart
+        fig = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=predicted_price / 1e7,
+            title={'text': "Predicted Price (Rs. Cr)"},
+            gauge={
+                'axis': {'range': [0, df['price'].max() / 1e7]},
+                'bar': {'color': '#2563eb'},
+                'steps': [
+                    {'range': [0, df['price'].quantile(0.33) / 1e7], 'color': '#10b981'},
+                    {'range': [df['price'].quantile(0.33) / 1e7, df['price'].quantile(0.66) / 1e7], 'color': '#f59e0b'},
+                    {'range': [df['price'].quantile(0.66) / 1e7, df['price'].max() / 1e7], 'color': '#ef4444'},
+                ],
+            }
+        ))
+        fig.update_layout(template='plotly_dark', height=300)
+        st.plotly_chart(fig, use_container_width=True)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAGE 3 — GEOGRAPHIC HEATMAP
+# ═══════════════════════════════════════════════════════════════════════════════
 elif page == "Geographic Heatmap":
     st.title("Bangalore Market Heatmap")
+    st.markdown("Interactive location-based market analysis across Bangalore.")
 
-    try:
-        import folium
-        from streamlit_folium import st_folium
+    metric = st.selectbox("Metric to Visualize", ['roi', 'avg_price', 'demand_score', 'market_trend'])
 
-        metric = st.selectbox(
-            "Color by", ['roi', 'price', 'demand_score', 'market_trend'])
+    loc_agg = df.groupby('location').agg(
+        lat=('latitude', 'mean'),
+        lon=('longitude', 'mean'),
+        avg_price=('price', 'mean'),
+        avg_roi=('roi', 'mean'),
+        count=('property_id', 'count'),
+        demand=('demand_score', 'mean'),
+        trend=('market_trend', 'mean')
+    ).reset_index()
 
-        loc_agg = df.groupby('location').agg(
-            lat=('latitude', 'mean'), lon=('longitude', 'mean'),
-            avg_price=('price', 'mean'), avg_roi=('roi', 'mean'),
-            count=('property_id', 'count'),
-            demand=('demand_score', 'mean'),
-            trend=('market_trend', 'mean')
-        ).reset_index()
+    color_col = {
+        'roi': 'avg_roi',
+        'avg_price': 'avg_price',
+        'demand_score': 'demand',
+        'market_trend': 'trend',
+    }[metric]
 
-        m = folium.Map(location=[12.9716, 77.5946], zoom_start=11,
-                       tiles='CartoDB dark_matter')
+    fig = px.scatter_mapbox(
+        loc_agg, lat='lat', lon='lon',
+        size='count',
+        color=color_col,
+        hover_name='location',
+        hover_data={
+            'avg_price': ':,.0f',
+            'avg_roi': ':.1f',
+            'count': True,
+        },
+        color_continuous_scale='Viridis',
+        size_max=40,
+        zoom=10,
+        mapbox_style='carto-darkmatter',
+        title=f'Bangalore — {metric.replace("_", " ").title()} by Location'
+    )
+    fig.update_layout(template='plotly_dark', height=600, margin={"r": 0, "l": 0, "b": 0, "t": 40})
+    st.plotly_chart(fig, use_container_width=True)
 
-        for _, row in loc_agg.iterrows():
-            val = row['avg_roi'] if metric == 'roi' else row['avg_price'] / \
-                1e7 if metric == 'price' else row['demand'] if metric == 'demand_score' else row['trend'] * 100
-            color = '#10b981' if (metric == 'roi' and val > 12) or (
-                metric == 'market_trend' and val > 12) else '#2563eb' if val > 8 else '#f59e0b'
+    st.dataframe(
+        loc_agg[['location', 'avg_price', 'avg_roi', 'count', 'demand', 'trend']]
+        .sort_values('avg_roi', ascending=False)
+        .rename(columns={'avg_price': 'Avg Price (Rs.)', 'avg_roi': 'Avg ROI (%)', 'count': 'Properties', 'demand': 'Demand Score', 'trend': 'Market Trend'})
+        .style.format({'Avg Price (Rs.)': 'Rs.{:,.0f}', 'Avg ROI (%)': '{:.1f}%', 'Market Trend': '{:.3f}'}),
+        use_container_width=True
+    )
 
-            folium.CircleMarker(
-                location=[row['lat'], row['lon']],
-                radius=max(8, row['count'] / 50),
-                color=color, fill=True, fill_color=color, fill_opacity=0.6,
-                popup=f"<b>{row['location']}</b><br>Avg: Rs.{row['avg_price']/1e7:.2f}Cr<br>ROI: {row['avg_roi']:.1f}%<br>Properties: {row['count']}"
-            ).add_to(m)
-
-        st_folium(m, width=None, height=600)
-
-    except ImportError:
-        st.warning(
-            "Install folium and streamlit-folium: pip install folium streamlit-folium")
-
-        # Fallback to plotly
-        loc_agg = df.groupby('location').agg(lat=('latitude', 'mean'), lon=(
-            'longitude', 'mean'), avg_roi=('roi', 'mean')).reset_index()
-        fig = px.scatter_mapbox(loc_agg, lat='lat', lon='lon', size='avg_roi', color='avg_roi',
-                                hover_name='location', zoom=10, mapbox_style='carto-darkmatter')
-        fig.update_layout(height=600)
-        st.plotly_chart(fig, use_container_width=True)
-
-# ===================================================================
-# PAGE 4: UNDERVALUED PROPERTIES
-# ===================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAGE 4 — UNDERVALUED OPPORTUNITIES
+# ═══════════════════════════════════════════════════════════════════════════════
 elif page == "Undervalued Opportunities":
     st.title("Undervalued Property Deals")
+    st.markdown("Properties where builder price is **below** the ML-predicted market value — best investment opportunities.")
 
-    if 'valuation_label' in df.columns:
-        underpriced = df[df['valuation_label'] ==
-                         'Underpriced'].sort_values('price_gap_pct')
+    if 'valuation_label' not in df.columns:
+        st.error("valuation_label column missing. Re-run the pipeline.")
+        st.stop()
 
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Underpriced", f"{len(underpriced):,}")
-        c2.metric("Avg Price Gap",
-                  f"{underpriced['price_gap_pct'].mean():.1f}%")
-        c3.metric("Best Deal Gap",
-                  f"{underpriced['price_gap_pct'].min():.1f}%")
+    underpriced = df[df['valuation_label'] == 'Underpriced'].copy()
 
-        # Filters
-        col1, col2 = st.columns(2)
-        loc_filter = col1.multiselect(
-            "Filter by Location", df['location'].unique())
-        budget = col2.slider("Max Budget (Rs. Cr)", 0.5, 10.0, 5.0)
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Underpriced Deals", f"{len(underpriced):,}")
+    c2.metric("Avg Price Gap", f"{underpriced['price_gap_pct'].mean():.1f}%")
+    c3.metric("Best Deal Gap", f"{underpriced['price_gap_pct'].max():.1f}%")
 
-        filtered = underpriced.copy()
-        if loc_filter:
-            filtered = filtered[filtered['location'].isin(loc_filter)]
-        filtered = filtered[filtered['price'] <= budget * 1e7]
+    st.markdown("---")
+    col1, col2 = st.columns(2)
+    loc_filter = col1.multiselect("Filter by Location", sorted(df['location'].unique()))
+    budget = col2.slider("Max Budget (Rs. Cr)", 0.5, 20.0, 10.0)
 
-        st.dataframe(
-            filtered[['property_id', 'location', 'property_type', 'sqft', 'bedrooms',
-                      'price', 'predicted_price', 'price_gap_pct', 'roi', 'sell_signal']]
-            .head(50)
-            .style.format({'price': 'Rs.{:,.0f}', 'predicted_price': 'Rs.{:,.0f}', 'price_gap_pct': '{:.1f}%', 'roi': '{:.1f}%'}),
-            use_container_width=True, height=500
-        )
-    else:
-        st.warning("Run recommendation engine first.")
+    filtered = underpriced.copy()
+    if loc_filter:
+        filtered = filtered[filtered['location'].isin(loc_filter)]
+    filtered = filtered[filtered['price'] <= budget * 1e7]
+    filtered = filtered.sort_values('price_gap_pct', ascending=False)
 
-# ===================================================================
-# PAGE 5: MODEL PERFORMANCE
-# ===================================================================
-elif page == "Model Performance":
-    st.title("Model Performance & Diagnostics")
+    st.markdown(f"**Showing {len(filtered)} deals**")
 
-    eval_report = load_json_report('evaluation_report.json')
-    baseline = load_json_report('baseline_results.json')
-
-    # Baseline comparison
-    if baseline:
-        st.subheader("Baseline Results")
-        bl_data = []
-        for name in ['global_mean', 'global_median', 'location_mean']:
-            b = baseline.get(name, {})
-            bl_data.append({'Model': name.replace('_', ' ').title(), 'RMSE': b.get(
-                'rmse', 0), 'MAE': b.get('mae', 0), 'R2': b.get('r2', 0)})
-        st.dataframe(pd.DataFrame(bl_data), use_container_width=True)
-
-    # Model metrics
-    if eval_report.get('model_metrics'):
-        st.subheader("ML Model Comparison")
-        metrics = eval_report['model_metrics']
-        m_data = [{'Model': k, **v} for k, v in metrics.items()]
-        st.dataframe(pd.DataFrame(m_data), use_container_width=True)
-
-        # Bar chart
-        m_df = pd.DataFrame(m_data)
-        fig = px.bar(m_df, x='Model', y='r2', color='Model', title='R2 Score Comparison',
-                     color_discrete_sequence=['#6366f1', '#8b5cf6', '#a78bfa', '#2563eb'])
-        fig.update_layout(template='plotly_dark')
+    # Bar chart of opportunities by location
+    opp_by_loc = filtered.groupby('location').size().reset_index(name='deals')
+    if len(opp_by_loc) > 0:
+        fig = px.bar(opp_by_loc, x='location', y='deals',
+                     color='deals', color_continuous_scale='Greens',
+                     title='Undervalued Deals by Location')
+        fig.update_layout(template='plotly_dark', height=350)
         st.plotly_chart(fig, use_container_width=True)
 
-    # Show diagnostic plots
-    st.subheader("Diagnostic Plots")
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    assets = os.path.join(base, 'ml/reports/assets')
+    show_cols = ['property_id', 'location', 'property_type', 'sqft', 'bedrooms',
+                 'price', 'predicted_price', 'price_gap_pct', 'roi']
+    available = [c for c in show_cols if c in filtered.columns]
 
-    plots = ['model_comparison.png', 'actual_vs_predicted.png', 'residual_distribution.png',
-             'residual_vs_predicted.png', 'feature_importance.png', 'location_error.png']
+    st.dataframe(
+        filtered[available].head(50)
+        .style.format({
+            'price': 'Rs.{:,.0f}',
+            'predicted_price': 'Rs.{:,.0f}',
+            'price_gap_pct': '{:.1f}%',
+            'roi': '{:.1f}%'
+        }),
+        use_container_width=True, height=450
+    )
 
-    cols = st.columns(2)
-    for i, plot in enumerate(plots):
-        path = os.path.join(assets, plot)
-        if os.path.exists(path):
-            cols[i % 2].image(path, caption=plot.replace(
-                '_', ' ').replace('.png', '').title())
-
-# ===================================================================
-# PAGE 6: BUYER MATCHING
-# ===================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAGE 5 — BUYER PREFERENCE MATCHING
+# ═══════════════════════════════════════════════════════════════════════════════
 elif page == "Buyer Preference Matching":
     st.title("Buyer Preference Matching")
+    st.markdown("Tell us your requirements and our AI will find the best matched properties.")
 
     col1, col2 = st.columns(2)
     with col1:
-        budget = st.slider("Budget (Rs. Lakhs)", 20, 800, 150) * 1e5
+        budget = st.slider("Budget (Rs. Lakhs)", 20, 1000, 200) * 1e5
         bedrooms = st.selectbox("Preferred Bedrooms", [1, 2, 3, 4, 5], index=1)
-        min_sqft = st.slider("Minimum Sqft", 500, 4000, 1000)
+        min_sqft = st.slider("Minimum Square Feet", 500, 4000, 1000)
+        min_roi = st.slider("Minimum ROI (%)", 5, 25, 10)
     with col2:
-        pref_location = st.selectbox("Preferred Location", [
-                                     'Any'] + sorted(df['location'].unique().tolist()))
-        min_amenities = st.slider("Min Amenities", 2, 20, 5)
+        pref_location = st.selectbox("Preferred Location", ['Any'] + sorted(df['location'].unique().tolist()))
+        prop_type = st.selectbox("Property Type", ['Any', 'Apartment', 'Villa', 'Penthouse', 'Builder Floor'])
+        max_metro = st.slider("Max Distance to Metro (km)", 0.5, 10.0, 3.0)
 
     if st.button("Find Matching Properties", type="primary", use_container_width=True):
-        artifacts = load_model('recommendation_artifacts.pkl')
+        candidates = df.copy()
+        candidates = candidates[candidates['price'] <= budget * 1.15]
+        candidates = candidates[candidates['sqft'] >= min_sqft]
+        candidates = candidates[candidates['bedrooms'] == bedrooms]
+        candidates = candidates[candidates['roi'] >= min_roi]
+        candidates = candidates[candidates['distance_metro'] <= max_metro]
 
-        if artifacts is not None:
-            buyer_pref = {
-                'bedrooms': bedrooms,
-                'sqft': min_sqft,
-                'location_score': 8.0,
-                'amenity_index': min_amenities / 20.0,
-                'luxury_score': 0.5,
-                'proximity_score': 7.0,
-                'price': budget,
-            }
+        if pref_location != 'Any':
+            loc_cands = candidates[candidates['location'] == pref_location]
+            if len(loc_cands) >= 3:
+                candidates = loc_cands
 
-            buyer_vec = artifacts['scaler'].transform(
-                pd.DataFrame([buyer_pref])[artifacts['feature_columns']]
-            )
-            sims = cosine_similarity(buyer_vec, artifacts['match_matrix'])[0]
-            df_copy = df.copy()
-            df_copy['match_score'] = sims
+        if prop_type != 'Any':
+            type_cands = candidates[candidates['property_type'] == prop_type]
+            if len(type_cands) >= 3:
+                candidates = type_cands
 
-            candidates = df_copy[df_copy['price'] <= budget * 1.15]
-            if pref_location != 'Any':
-                loc_cands = candidates[candidates['location'] == pref_location]
-                if len(loc_cands) >= 5:
-                    candidates = loc_cands
+        # Score by ROI + value gap
+        candidates['match_score'] = (
+            candidates['roi'] / candidates['roi'].max() * 0.5 +
+            candidates['price_gap_pct'].clip(0, 30) / 30 * 0.5
+        )
 
-            top = candidates.nlargest(15, 'match_score')
+        top = candidates.nlargest(15, 'match_score')
 
+        if len(top) == 0:
+            st.warning("No exact matches. Try relaxing filters (increase budget or reduce ROI requirement).")
+        else:
             st.success(f"Found {len(top)} matching properties!")
+
+            fig = px.scatter(
+                top, x='price', y='roi',
+                color='location', size='sqft',
+                hover_name='property_id',
+                hover_data={'price': ':,.0f', 'roi': ':.1f', 'sqft': True},
+                title='Matched Properties — ROI vs Price',
+                labels={'price': 'Price (Rs.)', 'roi': 'ROI (%)'}
+            )
+            fig.update_layout(template='plotly_dark', height=400)
+            st.plotly_chart(fig, use_container_width=True)
+
+            show_cols = ['property_id', 'location', 'property_type', 'sqft', 'bedrooms',
+                         'price', 'roi', 'match_score']
+            avail = [c for c in show_cols if c in top.columns]
             st.dataframe(
-                top[['property_id', 'location', 'property_type', 'sqft', 'bedrooms',
-                     'price', 'roi', 'match_score']]
-                .style.format({'price': 'Rs.{:,.0f}', 'roi': '{:.1f}%', 'match_score': '{:.3f}'}),
+                top[avail].style.format({
+                    'price': 'Rs.{:,.0f}',
+                    'roi': '{:.1f}%',
+                    'match_score': '{:.3f}'
+                }),
                 use_container_width=True
             )
-        else:
-            st.warning("Run recommendation engine first.")
 
-# ===================================================================
-# PAGE 7: ROI COMPARISON
-# ===================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# PAGE 6 — INVESTMENT ROI ANALYSIS
+# ═══════════════════════════════════════════════════════════════════════════════
 elif page == "Investment ROI Analysis":
-    st.title("ROI & Market Trend Analysis")
+    st.title("Investment ROI & Market Trend Analysis")
+    st.markdown("Compare return on investment across all 20 Bangalore localities.")
 
     loc_roi = df.groupby('location').agg(
         avg_roi=('roi', 'mean'),
@@ -471,89 +483,49 @@ elif page == "Investment ROI Analysis":
         count=('property_id', 'count')
     ).reset_index().sort_values('avg_roi', ascending=False)
 
-    fig = px.bar(loc_roi, x='location', y='avg_roi', color='avg_trend',
-                 color_continuous_scale='RdYlGn', title='ROI by Location (colored by Market Trend)',
-                 labels={'avg_roi': 'Avg ROI (%)', 'avg_trend': 'Trend (%)'})
+    # ROI Bar
+    fig = px.bar(
+        loc_roi, x='location', y='avg_roi', color='avg_trend',
+        color_continuous_scale='RdYlGn',
+        title='ROI by Location (colored by Market Trend)',
+        labels={'avg_roi': 'Avg ROI (%)', 'avg_trend': 'Trend (%)'}
+    )
     fig.update_layout(template='plotly_dark', height=450)
     st.plotly_chart(fig, use_container_width=True)
 
-    # Scatter: ROI vs Price
-    fig2 = px.scatter(loc_roi, x='avg_price', y='avg_roi', size='count',
-                      color='avg_trend', text='location',
-                      color_continuous_scale='Viridis',
-                      title='ROI vs Average Price',
-                      labels={'avg_price': 'Avg Price (Rs.)', 'avg_roi': 'Avg ROI (%)'})
-    fig2.update_traces(textposition='top center', textfont_size=9)
-    fig2.update_layout(template='plotly_dark', height=450)
-    st.plotly_chart(fig2, use_container_width=True)
+    col1, col2 = st.columns(2)
 
-    st.dataframe(loc_roi.style.format({
-        'avg_roi': '{:.1f}%', 'avg_trend': '{:.1f}%', 'avg_price': 'Rs.{:,.0f}'
-    }), use_container_width=True)
+    with col1:
+        # ROI vs Price scatter
+        fig2 = px.scatter(
+            loc_roi, x='avg_price', y='avg_roi',
+            size='count', color='avg_trend',
+            text='location',
+            color_continuous_scale='Viridis',
+            title='ROI vs Average Price',
+            labels={'avg_price': 'Avg Price (Rs.)', 'avg_roi': 'Avg ROI (%)'}
+        )
+        fig2.update_traces(textposition='top center', textfont_size=9)
+        fig2.update_layout(template='plotly_dark', height=400)
+        st.plotly_chart(fig2, use_container_width=True)
 
-# ===================================================================
-# PAGE 8: BUY/SELL SIGNAL
-# ===================================================================
-elif page == "Algorithmic Trading Signals":
-    st.title("Buy/Sell Recommendation Signal")
+    with col2:
+        # Top 5 locations pie
+        top5 = loc_roi.head(5)
+        fig3 = px.pie(
+            top5, values='avg_roi', names='location',
+            title='Top 5 Locations by ROI',
+            color_discrete_sequence=['#10b981', '#2563eb', '#6366f1', '#f59e0b', '#8b5cf6']
+        )
+        fig3.update_layout(template='plotly_dark', height=400)
+        st.plotly_chart(fig3, use_container_width=True)
 
-    if 'sell_signal' in df.columns:
-        signal_counts = df['sell_signal'].value_counts()
-        fig = px.pie(values=signal_counts.values, names=signal_counts.index,
-                     title='Signal Distribution',
-                     color_discrete_sequence=['#10b981', '#22c55e', '#f59e0b', '#ef4444', '#dc2626'])
-        fig.update_layout(template='plotly_dark')
-        st.plotly_chart(fig, use_container_width=True)
-
-        # Property lookup
-        st.subheader("Property Signal Lookup")
-        prop_id = st.text_input("Enter Property ID (e.g., BLR-10001)")
-        if prop_id:
-            prop = df[df['property_id'] == prop_id]
-            if len(prop) > 0:
-                p = prop.iloc[0]
-                c1, c2, c3 = st.columns(3)
-                c1.metric("Signal", p.get('sell_signal', 'N/A'))
-                c2.metric("ROI", f"{p['roi']:.1f}%")
-                c3.metric("Market Trend", f"{p['market_trend']*100:.1f}%")
-
-                st.json({
-                    'location': p['location'],
-                    'price': f"Rs.{p['price']:,.0f}",
-                    'predicted_price': f"Rs.{p.get('predicted_price', 0):,.0f}",
-                    'gap': f"{p.get('price_gap_pct', 0):.1f}%",
-                    'signal': p.get('sell_signal', 'N/A'),
-                    'demand_score': int(p['demand_score']),
-                })
-            else:
-                st.warning("Property not found.")
-    else:
-        st.warning("Run recommendation engine first.")
-
-# ===================================================================
-# PAGE 9: EXECUTIVE REPORT
-# ===================================================================
-elif page == "Executive Report":
-    st.title("Executive Summary Report")
-
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    report_path = os.path.join(base, 'ml/reports/executive_report.html')
-
-    if os.path.exists(report_path):
-        with open(report_path) as f:
-            html = f.read()
-        st.components.v1.html(html, height=2000, scrolling=True)
-
-        with open(report_path, 'rb') as f:
-            st.download_button("Download Report", f.read(),
-                               "executive_report.html", "text/html")
-    else:
-        st.warning("Executive report not generated yet. Run the full pipeline.")
-
-        # Show inline summary
-        st.subheader("Quick Summary")
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Properties", f"{len(df):,}")
-        c2.metric("Locations", f"{df['location'].nunique()}")
-        c3.metric("Avg Price", f"Rs.{df['price'].mean()/1e7:.2f}Cr")
-        c4.metric("Avg ROI", f"{df['roi'].mean():.1f}%")
+    st.markdown("### Full Location Comparison Table")
+    st.dataframe(
+        loc_roi.style.format({
+            'avg_roi': '{:.1f}%',
+            'avg_trend': '{:.1f}%',
+            'avg_price': 'Rs.{:,.0f}'
+        }),
+        use_container_width=True
+    )
